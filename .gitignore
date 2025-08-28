@@ -38,3 +38,6 @@ outputs/*
 .idea/
 *.swp
 *.swo
+
+# Notes
+NOTES.md
