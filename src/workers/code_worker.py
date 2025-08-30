@@ -21,8 +21,8 @@ class CodeWorker(BaseWorker):
         
         # Use the system prompt that was loaded from file by BaseWorker
         messages = [
-            {"role": "system", "content": self.system_prompt},  # ← FROM code_worker_prompt.txt
-            {"role": "user", "content": user_prompt}            # ← SPECIFIC REQUEST
+            {"role": "system", "content": self.system_prompt},  #FROM code_worker_prompt.txt
+            {"role": "user", "content": user_prompt}            #SPECIFIC REQUEST
         ]
         
         generated_code = await self._call_llm(messages, temperature=0.3, max_tokens=1500)

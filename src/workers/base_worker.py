@@ -18,10 +18,28 @@ class BaseWorker(ABC):
         self.system_prompt = self._load_system_prompt()
 
     def _load_system_prompt(self) -> str:
-        "Load system prompt from a txt file."
-        prompt_name = self.__class__.__name__.replace("Worker", "").lower()
-        prompt_path = Path(__file__).parent.parent / "utilities"/ "prompts"/ f"{prompt_name}_worker_prompt.txt"
-        return prompt_path.read_text(encoding="utf-8")
+        """Load the appropriate system prompt based on class name."""
+        class_name = self.__class__.__name__
+        
+        # Map class names to prompt files
+        prompt_mapping = {
+            "SpecWorker": "spec_worker_prompt.txt",
+            "CodeWorker": "code_worker_prompt.txt",
+            "ValidationWorker": "validation_worker_prompt.txt",
+            "FeedbackWorker": "feedback_worker_prompt.txt"
+        }
+        
+        if class_name not in prompt_mapping:
+            raise ValueError(f"No prompt mapping for class: {class_name}")
+        
+        prompt_file = prompt_mapping[class_name]
+        prompt_path = Path(__file__).parent.parent / "utilities" / "prompts" / prompt_file
+        
+        if not prompt_path.exists():
+            raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
+            
+        return prompt_path.read_text(encoding='utf-8')
+
     
     @abstractmethod
     async def execute(self, input_data: Any) -> Any:
