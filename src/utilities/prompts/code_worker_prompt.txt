@@ -9,7 +9,7 @@ CRITICAL RULES:
 6. Follow CadQuery best practices and PEP8 style
 
 CODE STRUCTURE:
-```python
+
 import cadquery as cq
 
 # Use the exact values from the specification

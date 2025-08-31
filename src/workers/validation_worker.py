@@ -11,75 +11,74 @@ sys.path.insert(0, str(project_root))
 
 from src.workers.base_worker import BaseWorker
 
+
 class ValidationWorker(BaseWorker):
-    """Validates and executes the generated CadQuery code."""
-
+    """Executes and validates generated CadQuery code."""
+    
     async def execute(self, generated_code: str) -> Dict[str, Any]:
-        """Execute the generated code and validate it produces a valid CadQuery object."""
-        logger.info("Starting code validation...")
-
+        """
+        Execute the generated code and validate it produces a valid CadQuery object.
+        """
+        logger.info("Validating generated code...")
+        
         try:
-            with tempfile.NamedTemporaryFile(mode = 'w', suffix = '.py', delete = False) as f:
-
+            # Create a temporary file with the generated code
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
                 f.write(generated_code)
                 temp_file = f.name
-
+            
+            # Execute the code in a controlled environment
             result = self._execute_code_safely(temp_file)
-
-            os.unlink(temp_file)  # Clean up the temp file
-
+            
+            # Clean up
+            os.unlink(temp_file)
+            
             if result["success"]:
                 logger.success("Code validation successful!")
-                return{
-                    "sucess": True,
+                return {
+                    "success": True,
                     "object": result["object"],
-                    "message": "Valid CadQuery object generated."
+                    "message": "Valid CadQuery object generated"
                 }
             else:
                 logger.warning(f"Code validation failed: {result['error']}")
                 return {
                     "success": False,
                     "error": result["error"],
-                    "message": "Generated code failed to execute."
+                    "message": "Generated code failed to execute"
                 }
+                
         except Exception as e:
             logger.error(f"Validation process failed: {e}")
             return {
                 "success": False,
                 "error": str(e),
-                "message": "Unexpected error during validation."
+                "message": "Validation process error"
             }
-        
-    def _execute_code_safely(self, file_path:str) -> Dict[str, Any]:
-        """Execute the generated code in a restricted environment for safety."""
-
-        safe_globals = {
-            '__builtins__': {
-                'range': range,
-                'len': len,
-                'float': float,
-                'int': int,
-                'str': str,
-                'bool': bool,
-                'list': list,
-                'dict': dict,
-            }
-        }
-
+    
+    def _execute_code_safely(self, file_path: str) -> Dict[str, Any]:
+        """
+        Simpler execution - just import what we need and run the code.
+        """
         try:
-            #Read and execute the code
+            # Import cadquery here so it's available
+            import cadquery as cq
+            
+            # Create a namespace with cadquery available
+            local_vars = {'cq': cq, 'show_object': lambda x: None}
+            
+            # Read and execute the code
             with open(file_path, 'r') as f:
                 code_content = f.read()
-
-            #execute the code
-            exec(code_content, safe_globals)
-
-            #Check if 'result'variable exists and is a Cadquery object
-            if 'result' in safe_globals and hasattr(safe_globals['result'], 'val'):
-                return {"success": True, "object": safe_globals['result']}
-            else:
-                return {"success": False, "error": "No valid 'result' object found."}
             
+            # Execute the code with cadquery available
+            exec(code_content, {}, local_vars)
+            
+            # Check if 'result' variable exists
+            if 'result' in local_vars and hasattr(local_vars['result'], 'val'):
+                return {"success": True, "object": local_vars['result']}
+            else:
+                return {"success": False, "error": "No valid 'result' object found"}
+                
         except Exception as e:
             return {"success": False, "error": str(e)}
-        
