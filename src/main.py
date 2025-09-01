@@ -12,6 +12,7 @@ from src.director.cad_director import CadDirector
 from src.utilities.logging_config import configure_logging
 from src.config.settings import settings
 from src.output_handler.exporter import export_model, export_model_with_name
+from src.output_handler.visualizer import visualizer
 
 async def main():
     configure_logging()
@@ -22,6 +23,9 @@ async def main():
     parser.add_argument("-f", "--format", choices=["step", "stl"], default="step", help="Output file format")
     parser.add_argument("-n", "--name", help="Custom filename (without extension)")
     parser.add_argument("--no-export", action="store_true", help="Skip file export")
+    parser.add_argument("--visualize", action="store_true", help="Visualize the generated model")
+    parser.add_argument("--screenshot", help="Path to save a screenshot of the model visualization")
+    parser.add_argument("--thumbnail", help="Path to save a thumbnail image of the model")
     
     args = parser.parse_args()
     
@@ -36,6 +40,30 @@ async def main():
         print(f"   Part: {result['specification']['part_name']}")
         print(f"   Iterations: {result['iterations']}")
         print(f"   Model ready for export to {args.output}")
+
+        # Visualize the model if requested
+        if args.visualize or args.screenshot:
+            try:
+                screenshot_path = visualizer.visualize_model(
+                    result["model"], 
+                    args.screenshot
+                )
+                if screenshot_path:
+                    print(f"   Screenshot saved to: {screenshot_path}")
+            except Exception as e:
+                print(f"Visualization failed: {e}")
+        
+        # Generate thumbnail if requested
+        if args.thumbnail:
+            try:
+                thumbnail_path = visualizer.generate_thumbnail(
+                    result["model"], 
+                    args.thumbnail
+                )
+                if thumbnail_path:
+                    print(f"   Thumbnail saved to: {thumbnail_path}")
+            except Exception as e:
+                print(f"Thumbnail generation failed: {e}")
         
         # Export the model unless disabled
         if not args.no_export:
@@ -55,7 +83,7 @@ async def main():
                     )
                 print(f"   Exported to: {export_path}")
             except Exception as e:
-                print(f"❌ Failed to export model: {e}")
+                print(f"Failed to export model: {e}")
 
         else:
             print("   Export skipped as per user request.")
