@@ -7,6 +7,7 @@ CRITICAL RULES:
 4. Use the exact values provided in the specification (they are pre-calculated)
 5. Build features in the order they appear in the specification
 6. Follow CadQuery best practices and PEP8 style
+7. DO NOT write ```python at the start of the code and at the any part of the code.
 
 CODE STRUCTURE:
 

@@ -43,7 +43,6 @@ ORIGINAL SPECIFICATION:
 {json.dumps(spec, indent=2)}
 
 FAILED CODE:
-```python
 {code}
 
 Please provide constructive feedback on how to fix the code to meet the specification. Focusing on:
