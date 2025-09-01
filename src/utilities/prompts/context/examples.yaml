@@ -1,0 +1,608 @@
+# Some basic level examples.
+- '#': '1'
+  Code: 
+    import cadquery as cq\n\n# parameters\nlength =4\nheight = 3\nthickness =
+      0.5\nfillet_radius = 0.5\n\n# functions\nresult = cq.Workplane("XY" ).box(length,
+      height, thickness).edges("|Z").fillet(fillet_radius)
+  Name of Part: Simple Rectangular Plate
+  label: A rectangular plate with length of 4 mm, height of 3 mm and a thickness of
+    0.5 mm\nThe edges of the plate are filleted with a fillet radius of 0.5 mm
+- '#': '2'
+  Code:  
+    import cadquery as cq\n\n# parameters\nlength = 80.0\nheight = 60.0\nthickness
+      = 10.0\ncenter_hole_dia = 22.0\n\n# functions\nresult = (\n    cq.Workplane("XY")\n    .box(length,
+      height, thickness)\n    .faces(">Z")\n    .workplane()\n    .hole(center_hole_dia)\n)
+  Name of Part: Plate with Hole
+  label: A rectangular plate with length of 80 units, height of 60 mm and a thickness
+    of 10 mm\nThe plate has a hole in the geometric center. The hole has a diameter
+    of 22 mm
+- '#': '3'
+  Code:  
+    import cadquery as cq\n result = cq.Workplane("front").circle(2.0).rect(0.5, 0.75).extrude(0.5)\n
+  Name of Part: An extruded prismatic solid 
+  label: A circular plate with a rectangular hole of length 0.5mm and 0.75mm width at the center created in the front plane with a radius of 2 mm and extruded to a height of 0.5 mm
+- '#': '4'
+  Code: 
+    import cadquery as cq\nresult = (\ncq.Workplane("front")\n
+      .lineTo(2.0, 0)\n
+      .lineTo(2.0, 1.0)\n
+      .threePointArc((1.0, 1.5), (0.0, 1.0))\n
+      .close()\n
+      .extrude(0.25)\n
+      )\n
+  Name of Part: A prismatic solid with a three-point arc and line segments
+  label: A prismatic solid created in the front plane with a three-point arc and line segments. The arc connects the points (2.0, 1.0) and (0.0, 1.0) with a control point at (1.0, 1.5). The solid is extruded to a height of 0.25 mm.
+- '#': '5'
+  Code: import cadquery as cq\nresult = cq.Workplane("front").circle(3.0)\n# current point is the center of the circle, at (0, 0)\n\nresult = result.center(1.5, 0.0).rect(0.5, 0.5)\n# new work center is (1.5, 0.0)\n\nresult = result.center(-1.5, 1.5).circle(0.25)\n# new work center is (0.0, 1.5). This is relative to the previous center.\n\nresult = result.extrude(0.25)
+  Name of Part: A prismatic solid with circles and rectangles
+  label: A circular plate with a rectangular and circle hole created in the front plane. The circular plate has a radius of 3mm and extruded to a height of 0.25 mm. The rectangular hole is at the location (-1.5, 0) and has a length of 0.5 mm and width of 0.5 mm, and the circle hole with location at (0, 1.5) and
+   has a radius of 0.25 mm.
+- '#': '6'
+  Code: import cadquery as cq\nr = cq.Workplane("front").circle(2.0)# make base\nr = r.pushPoints([(1.5, 0), (0, 1.5), (-1.5, 0), (0, -1.5)])# now four points are on the stack\nr = r.circle(0.25)# circle will operate on all four points\nresult = r.extrude(0.125)# make prism
+  Name of Part: A prismatic solid with multiple holes.
+  label: A circular plate with four holes created in the front plane. The circular plate has a radius of 2 mm and extruded to a height of 0.125 mm. The holes are at the locations (1.5, 0), (0, 1.5), (-1.5, 0), and (0, -1.5) with a radius of 0.25 mm each.
+- '#': '7'
+  Code: import cadquery as cq\nresult = (\ncq.Workplane("front")\n.box(3.0, 4.0, 0.25)\n.pushPoints([(0, 0.75), (0, -0.75)])\n.polygon(6, 1.0)\n.cutThruAll()\n)
+  Name of Part: A prismatic solid with two hexagonal cutouts 
+  label: A rectangular plate with a length of 3 mm, height of 4 mm and a thickness of 0.25 mm. The plate has two hexagonal cutouts at the locations (0, 0.75) and (0, -0.75) with a radius of 1 mm each.
+- '#': '8'
+  Code: import cadquery as cq\n(L, H, W, t) = (100.0, 20.0, 20.0, 1.0)\npts = [\n    (0, H / 2.0),\n    (W / 2.0, H / 2.0),\n    (W / 2.0, (H / 2.0 - t)),\n    (t / 2.0, (H / 2.0 - t)),\n    (t / 2.0, (t - H / 2.0)),\n    (W / 2.0, (t - H / 2.0)),\n    (W / 2.0, H / -2.0),\n    (0, H / -2.0),\n]\nresult = cq.Workplane("front").polyline(pts).mirrorY().extrude(L)
+  Name of Part: A solid beam with 'H' cross-section.
+  label: A solid beam with a length of 100 mm, height of 20 mm, width of 20 mm and a thickness of 1 mm. The cross-section is an 'H' shape with the specified points.
+- '#': '9'
+  Code: import cadquery as cq\ns = cq.Workplane("XY")\nsPnts = [\n    (2.75, 1.5),\n    (2.5, 1.75),\n    (2.0, 1.5),\n    (1.5, 1.0),\n    (1.0, 1.25),\n    (0.5, 1.0),\n    (0, 1.0),\n]\nr = s.lineTo(3.0, 0).lineTo(3.0, 1.0).spline(sPnts, includeCurrent=True).close()\nresult = r.extrude(0.5)
+  Name of Part: A prismatic solid with a spline and line segments
+  label: A prismatic solid created in the XY plane with a spline and line segments. The spline connects the points (2.75, 1.5), (2.5, 1.75), (2.0, 1.5), (1.5, 1.0), (1.0, 1.25), (0.5, 1.0), and (0, 1.0). The solid is extruded to a height of 0.5 mm.
+- '#': '10'
+  Code: import cadquery as cq\nr = cq.Workplane("front").hLine(1.0)# 1.0 is the distance, not coordinate\nr = (\n    r.vLine(0.5).hLine(-0.25).vLine(-0.25).hLineTo(0.0)\n)# hLineTo allows using xCoordinate not distance\nresult = r.mirrorY().extrude(0.25)# mirror the geometry and extrude
+  Name of Part: A prismatic solid with horizontal and vertical lines
+  label: A sketch is created in a front plane. The sketch has a horizontal line with a distance of 1.0 mm, and the vertical lines have distances of 0.5 mm and -0.25 mm. The sketch is mirrored along the Y-axis and extruded to 0.25 mm.
+- '#': '11'
+  Code: import cadquery as cq\nresult = cq.Workplane("front").box(2, 3, 0.5)# make a basic prism\nresult = (\n    result.faces(">Z").workplane().hole(0.5)\n)# find the top-most face and make a hole
+  Name of Part: A prismatic rectangular solid with a hole.
+  label: A rectangular plate with a length of 2 mm, height of 3 mm and a thickness of 0.5 mm. The plate has a hole in the geometric center on the top face with a diameter of 0.5 mm.
+- '#': '12'
+  Code: import cadquery as cq\nresult = cq.Workplane("front").box(3, 2, 0.5)# make a basic prism\nresult = (\n    result.faces(">Z").vertices("<XY").workplane(centerOption="CenterOfMass")\n)# select the lower left vertex and make a workplane\nresult = result.circle(1.0).cutThruAll()# cut the corner out
+  Name of Part: A prismatic rectangular solid with a circular cutout
+  label: A rectangular plate with a length of 3 mm, height of 2 mm and a thickness of 0.5 mm. The plate has a circular cutout in the lower left corner with a radius of 1 mm.
+- '#': '13'
+  Code: import cadquery as cq\nresult = (\n    cq.Workplane("front")\n    .box(4.0, 4.0, 0.25)\n    .faces(">Z")\n    .workplane()\n    .transformed(offset=cq.Vector(0, -1.5, 1.0), rotate=cq.Vector(60, 0, 0))\n    .rect(1.5, 1.5, forConstruction=True)\n    .vertices()\n    .hole(0.25)\n)
+  Name of Part: A rectangular box with angeled holes
+  label: A rectangular box with a length of 4 mm, height of 4 mm and a thickness of 0.25 mm. The box has holes at an angle of 60 degrees from the Z-axis, with a diameter of 0.25 mm, located at the center of the top face.
+- '#': '14'
+  Code: import cadquery as cq\nresult = cq.Workplane("front").box(2, 2, 2).shell(-0.1)
+  Name of Part: Box with a negative shell to hollow inside
+  label: A box with length 2mm is created on the front plane. A shell operation with thickness -0.1 mm hollows the inside of the box, leaving walls of 0.1 mm thickness.
+- '#': '15'
+  Code: import cadquery as cq\nresult = cq.Workplane("front").box(2, 2, 2).shell(0.1)
+  Name of Part: Box with positive shell creating outer walls
+  label: A box with length 2mm is created on the front plane. A shell operation with thickness 0.1 mm adds material to the outside, effectively thickening the box walls outward.
+- '#': '16'
+  Code: import cadquery as cq\nresult = cq.Workplane("front").box(2, 2, 2).faces("+Z").shell(0.1)
+  Name of Part: Box with shell applied only to the top face
+  label: A box with length 2mm is created on the front plane. A shell operation with thickness 0.1 mm is applied only to the top face (`+Z`), hollowing or thickening that face while keeping other faces unchanged.
+- '#': '17'
+  Code: import cadquery as cq\nresult = cq.Workplane("front").box(2, 2, 2).faces("+Z or -X or +X").shell(0.1)
+  Name of Part: Box with shell applied to top and side faces
+  label: A box with length 2mm is created on the front plane. A shell operation with thickness 0.1 mm is applied to the top face (`+Z`) and both side faces (`-X` and `+X`), modifying the thickness selectively on those faces.
+- '#': '18'
+  Code: import cadquery as cq\nresult = (\n    cq.Workplane("front")\n    .box(4.0, 4.0, 0.25)\n    .faces(">Z")\n    .circle(1.5)\n    .workplane(offset=3.0)\n    .rect(0.75, 0.5)\n    .loft(combine=True)\n)
+  Name of Part: Lofted solid between a circle and a rectangle
+  label: A 4 x 4 x 0.25 mm box is created on the front plane. A 1.5 diameter circle is sketched on the top face, then a workplane is offset 3.0 mm above, where a 0.75×0.5 rectangle is sketched. These profiles are lofted together to form a solid.
+- '#': '19'
+  Code: import cadquery as cq\nresult = (\n    cq.Workplane(cq.Plane.XY())\n    .box(4, 2, 0.5)\n    .faces(">Z")\n    .workplane()\n    .rect(3.5, 1.5, forConstruction=True)\n    .vertices()\n    .cboreHole(0.125, 0.25, 0.125, depth=None)\n)
+  Name of Part: Box with countersunk holes at rectangle vertices
+  label: A 4 x 2 x 0.5 mm box on the XY plane. On the top face, a construction rectangle is created. Countersunk holes with diameter 0.125 mm, bore diameter 0.25 mm, and bore depth 0.125 mm are drilled at the rectangle vertices.
+- '#': '20'
+  Code: import cadquery as cq\nresult = cq.Workplane("XY").box(3, 3, 0.5).edges("|Z").fillet(0.125)
+  Name of Part: Box with filleted vertical edges
+  label: A 3 x 3 x 0.5 mm box created on the XY plane. The vertical edges (`|Z`) are selected and filleted with a radius of 0.125 mm to smooth the corners.
+- '#': '21'
+  Code: (length, height, bearing_diam, thickness, padding) = (30.0, 40.0, 22.0, 10.0, 8.0)\n\nresult = (\n    cq.Workplane("XY")\n    .box(length, height, thickness)\n    .faces(">Z")\n    .workplane()\n    .hole(bearing_diam)\n    .faces(">Z")\n    .workplane()\n    .rect(length - padding, height - padding, forConstruction=True)\n    .vertices()\n    .cboreHole(2.4, 4.4, 2.1)\n)
+  Name of Part: A parametric bearing pillow block
+  label: A box with dimensions length x height x  thickness created on the XY plane. A central hole with diameter bearing_diam is drilled on the top face. On the same face, a construction rectangle smaller by padding is created, and countersunk holes are drilled at its vertices.
+
+#some intermediate level examples
+- '#': '23'
+  Code: import cadquery as cq\n\n# The dimensions of the model. These can be modified rather than changing the\n# object's code directly.\nwidth = 400\nheight = 500\nthickness = 2\n\n# Create a plate with multiple symmetric polygonal cutouts\nresult = cq.Workplane("front").box(width, height, thickness)\n\nh_sep = 60\nfor idx in range(4):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(157,210-idx*h_sep).moveTo(-23.5,0).circle(1.6).moveTo(23.5,0).circle(1.6).moveTo(-17.038896,-5.7).threePointArc((-19.44306,-4.70416),(-20.438896,-2.3)).lineTo(-21.25,2.3).threePointArc((-20.25416,4.70416),(-17.85,5.7)).lineTo(17.85,5.7).threePointArc((20.25416,4.70416),(21.25,2.3)).lineTo(20.438896,-2.3).threePointArc((19.44306,-4.70416),(17.038896,-5.7)).close().cutThruAll()\n\nfor idx in range(4):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(157,-30-idx*h_sep).moveTo(-16.65,0).circle(1.6).moveTo(16.65,0).circle(1.6).moveTo(-10.1889,-5.7).threePointArc((-12.59306,-4.70416),(-13.5889,-2.3)).lineTo(-14.4,2.3).threePointArc((-13.40416,4.70416),(-11,5.7)).lineTo(11,5.7).threePointArc((13.40416,4.70416),(14.4,2.3)).lineTo(13.5889,-2.3).threePointArc((12.59306,-4.70416),(10.1889,-5.7)).close().cutThruAll()\n\nh_sep4DB9 = 30\nfor idx in range(8):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(91,225-idx*h_sep4DB9).moveTo(-12.5,0).circle(1.6).moveTo(12.5,0).circle(1.6).moveTo(-6.038896,-5.7).threePointArc((-8.44306,-4.70416),(-9.438896,-2.3)).lineTo(-10.25,2.3).threePointArc((-9.25416,4.70416),(-6.85,5.7)).lineTo(6.85,5.7).threePointArc((9.25416,4.70416),(10.25,2.3)).lineTo(9.438896,-2.3).threePointArc((8.44306,-4.70416),(6.038896,-5.7)).close().cutThruAll()\n\nfor idx in range(4):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(25,210-idx*h_sep).moveTo(-23.5,0).circle(1.6).moveTo(23.5,0).circle(1.6).moveTo(-17.038896,-5.7).threePointArc((-19.44306,-4.70416),(-20.438896,-2.3)).lineTo(-21.25,2.3).threePointArc((-20.25416,4.70416),(-17.85,5.7)).lineTo(17.85,5.7).threePointArc((20.25416,4.70416),(21.25,2.3)).lineTo(20.438896,-2.3).threePointArc((19.44306,-4.70416),(17.038896,-5.7)).close().cutThruAll()\n\nfor idx in range(4):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(25,-30-idx*h_sep).moveTo(-16.65,0).circle(1.6).moveTo(16.65,0).circle(1.6).moveTo(-10.1889,-5.7).threePointArc((-12.59306,-4.70416),(-13.5889,-2.3)).lineTo(-14.4,2.3).threePointArc((-13.40416,4.70416),(-11,5.7)).lineTo(11,5.7).threePointArc((13.40416,4.70416),(14.4,2.3)).lineTo(13.5889,-2.3).threePointArc((12.59306,-4.70416),(10.1889,-5.7)).close().cutThruAll()\n\nfor idx in range(8):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(-41,225-idx*h_sep4DB9).moveTo(-12.5,0).circle(1.6).moveTo(12.5,0).circle(1.6).moveTo(-6.038896,-5.7).threePointArc((-8.44306,-4.70416),(-9.438896,-2.3)).lineTo(-10.25,2.3).threePointArc((-9.25416,4.70416),(-6.85,5.7)).lineTo(6.85,5.7).threePointArc((9.25416,4.70416),(10.25,2.3)).lineTo(9.438896,-2.3).threePointArc((8.44306,-4.70416),(6.038896,-5.7)).close().cutThruAll()\n\nfor idx in range(4):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(-107,210-idx*h_sep).moveTo(-23.5,0).circle(1.6).moveTo(23.5,0).circle(1.6).moveTo(-17.038896,-5.7).threePointArc((-19.44306,-4.70416),(-20.438896,-2.3)).lineTo(-21.25,2.3).threePointArc((-20.25416,4.70416),(-17.85,5.7)).lineTo(17.85,5.7).threePointArc((20.25416,4.70416),(21.25,2.3)).lineTo(20.438896,-2.3).threePointArc((19.44306,-4.70416),(17.038896,-5.7)).close().cutThruAll()\n\nfor idx in range(4):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(-107,-30-idx*h_sep).circle(14).rect(24.7487,24.7487, forConstruction=True).vertices().hole(3.2).cutThruAll()\n\nfor idx in range(8):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(-173,225-idx*h_sep4DB9).moveTo(-12.5,0).circle(1.6).moveTo(12.5,0).circle(1.6).moveTo(-6.038896,-5.7).threePointArc((-8.44306,-4.70416),(-9.438896,-2.3)).lineTo(-10.25,2.3).threePointArc((-9.25416,4.70416),(-6.85,5.7)).lineTo(6.85,5.7).threePointArc((9.25416,4.70416),(10.25,2.3)).lineTo(9.438896,-2.3).threePointArc((8.44306,-4.70416),(6.038896,-5.7)).close().cutThruAll()\n\nfor idx in range(4):\n    result = result.workplane(offset=1, centerOption='CenterOfBoundBox').center(-173,-30-idx*h_sep).moveTo(-2.9176,-5.3).threePointArc((-6.05,0),(-2.9176,5.3)).lineTo(2.9176,5.3).threePointArc((6.05,0),(2.9176,-5.3)).close().cutThruAll()
+  Name of Part: Complex connector plate with repeated symmetric DB9-like cutouts
+  label: A complex connector plate with a width of 400 mm, height of 500 mm and a thickness of 2 mm. The plate has multiple symmetric polygonal cutouts resembling DB9 connectors, arranged in a grid pattern with specific spacing and dimensions.
+- '#': '24'
+  Code: import cadquery as cq\n\n# parameter definitions\np_outerWidth = 100.0\np_outerLength = 150.0\np_outerHeight = 50.0\n\np_thickness = 3.0\np_sideRadius = 10.0\np_topAndBottomRadius = 2.0\n\np_screwpostInset = 12.0\np_screwpostID = 4.0\np_screwpostOD = 10.0\n\np_boreDiameter = 8.0\np_boreDepth = 1.0\np_countersinkDiameter = 0.0\np_countersinkAngle = 90.0\np_flipLid = True\np_lipHeight = 1.0\n\n# outer shell\noshell = cq.Workplane(\"XY\").rect(p_outerWidth, p_outerLength).extrude(p_outerHeight + p_lipHeight)\n\nif p_sideRadius > p_topAndBottomRadius:\n    oshell = oshell.edges(\"|Z\").fillet(p_sideRadius)\n    oshell = oshell.edges(\"#Z\").fillet(p_topAndBottomRadius)\nelse:\n    oshell = oshell.edges(\"#Z\").fillet(p_topAndBottomRadius)\n    oshell = oshell.edges(\"|Z\").fillet(p_sideRadius)\n\n# inner shell\nishell = (oshell.faces(\"<Z\").workplane(p_thickness, True)\n    .rect(p_outerWidth - 2.0 * p_thickness, p_outerLength - 2.0 * p_thickness)\n    .extrude(p_outerHeight - 2.0 * p_thickness, False))\nishell = ishell.edges(\"|Z\").fillet(p_sideRadius - p_thickness)\n\nbox = oshell.cut(ishell)\n\nPOSTWIDTH = p_outerWidth - 2.0 * p_screwpostInset\nPOSTLENGTH = p_outerLength - 2.0 * p_screwpostInset\n\nbox = (box.faces(\">Z\").workplane(-p_thickness)\n    .rect(POSTWIDTH, POSTLENGTH, forConstruction=True)\n    .vertices().circle(p_screwpostOD / 2.0).circle(p_screwpostID / 2.0)\n    .extrude(-(p_outerHeight + p_lipHeight - p_thickness), True))\n\nlid, bottom = box.faces(\">Z\").workplane(-p_thickness - p_lipHeight).split(keepTop=True, keepBottom=True).all()\n\nlowerLid = lid.translate((0, 0, -p_lipHeight))\ncutlip = lowerLid.cut(bottom).translate((p_outerWidth + p_thickness, 0, p_thickness - p_outerHeight + p_lipHeight))\n\ntopOfLidCenters = cutlip.faces(\">Z\").workplane().rect(POSTWIDTH, POSTLENGTH, forConstruction=True).vertices()\n\nif p_boreDiameter > 0 and p_boreDepth > 0:\n    topOfLid = topOfLidCenters.cboreHole(p_screwpostID, p_boreDiameter, p_boreDepth, 2.0 * p_thickness)\nelif p_countersinkDiameter > 0 and p_countersinkAngle > 0:\n    topOfLid = topOfLidCenters.cskHole(p_screwpostID, p_countersinkDiameter, p_countersinkAngle, 2.0 * p_thickness)\nelse:\n    topOfLid = topOfLidCenters.hole(p_screwpostID, 2.0 * p_thickness)\n\nif p_flipLid:\n    topOfLid = topOfLid.rotateAboutCenter((1, 0, 0), 180)\n\nresult = topOfLid.union(bottom)
+  Name of Part: Parametric box enclosure with lid and screw posts
+  label: A fully parametric rectangular box enclosure with filleted edges, hollow interior, lid lip, and screw post cutouts. The box has a width of 100 mm, length of 150 mm, height of 50 mm, and a wall thickness of 3 mm. The screw posts are inset by 12 mm with an outer diameter of 10 mm and an inner diameter of 4 mm. The lid can be flipped, and it has a lip height of 1 mm. The top face has countersunk holes or bore holes for screws.  
+- '#': '25'
+  Code: import cadquery as cq\nfrom cadquery import selectors\n\n# This example demonstrates the use of a fillet to reinforce a junction between two parts.\nmodel = cq.Workplane("XY").box(15.0, 15.0, 2.0)\n    .faces(">Z").rect(10.0, 10.0, forConstruction=True)\n    .vertices().cskHole(2.0, 4.0, 82)\n    .faces(">Z").circle(4.0).extrude(10.0)\n    .faces(">Z").hole(6)\n\n# Apply fillet to the weak junction between box and cylinder\nresult = model.faces('<Z[1]').edges(selectors.NearestToPointSelector((0.0, 0.0))).fillet(1)
+  Name of Part: Pipe connector with filleted reinforcement
+  label: A pipe connector composed of a box and an extruded cylinder. The junction between the two solids is reinforced using a fillet on the nearest edge to the center of the bottom face. The top surface of the box includes countersunk holes for mounting.
+- '#': '26'
+  Code: import cadquery as cq\nBS = cq.selectors.BoxSelector\n\n# PARAMETERS\nmount_holes = True\nmw = 40\nmh = 13\nml = 120\nwd = 6\nrt = 7\nrl = 50\nrwpl = 10\npf = 18\nmhd = 7\nmht = 3\nfhd = 6\n\n# draw base\nbase = cq.Workplane("XY").box(ml, mw, mh, (True, True, False))\n\n# draw wire pocket\npocket = cq.Workplane("XY", (0, 0, mh)).moveTo(-ml/2., 0).line(0, wd/2.)\n    .line((ml-rl)/2.-rwpl, 0).line(rwpl, rt).line(rl, 0)\n    .line(rwpl, -rt).line((ml-rl)/2.-rwpl, 0)\n    .line(0, -(wd/2.)).close().revolve(axisEnd=(1, 0))\n    .edges(BS((-rl/2.-rwpl-.1, -100, -100), (rl/2.+rwpl+.1, 100, 100)))\n    .fillet(pf)\n\nr = base.cut(pocket)\n\n# mount holes\nif mount_holes:\n    px = ml/2.-mht-mhd/2.\n    py = mw/2.-mht-mhd/2\n    r = r.faces(\"<Z\").workplane().pushPoints([\n        (px, py),\n        (-px, py),\n        (-px, -py),\n        (px, -py)\n    ]).hole(mhd)\n\n# fill holes\nr = r.faces(\"<Y\").workplane().center(0, mh/2.).pushPoints([\n    (-rl/2., 0),\n    (0, 0),\n    (rl/2., 0)\n]).hole(fhd, mw/2.)
+  Name of Part: Mold block with wire channel, mount holes, and fill holes
+  label: A rectangular mold with a central wire channel revolved and filleted, optionally including four mounting holes and three vertical fill holes. The mold base is constructed as a box and material is removed using revolved wire geometry and additional holes on appropriate faces.
+- '#': '27'
+  Code: import cadquery as cq\nfrom cadquery import Assembly, Color, Location as Loc, Vector as Vec\nfrom numpy import linspace,diff\n\nWs = 1200\nHs = 600\nW = 770\nH = 460\nd = 5\nN = 7\nh = 50\n\nvpts = [(0,-3*H/8), (0,-H/4),(0,-H/8), (0,0), (0,H/8),(0,H/4),(0,3*H/8)]\npts = linspace(-(W-d)/2,(W-d)/2,N+2)\ndelta = diff(pts)[0]\n\ndef make_base():\n    return (\n        cq.Workplane()\n        .rect(W,H)\n        .extrude(d)\n        .pushPoints(\n            [(pt,0) for pt in pts] + \n            [(0,H/2-d/2),(0,-H/2+d/2)])\n        .rect(d,d)\n        .cutThruAll()\n    )\n\ndef make_side():\n    return cq.Workplane().rect(d,H-2*d).extrude(h)\n\ndef make_front():\n    return (\n        cq.Workplane()\n        .rect(W,d).extrude(h-d)\n        .faces('<Z').workplane()\n        .rect(d,d).extrude(d)\n        .faces('<Y').workplane()\n        .pushPoints([(pt,(h-d)/2) for pt in pts])\n        .rect(d,d).cutThruAll()\n    )\n\ndef make_divider():\n    return (\n        cq.Workplane()\n        .rect(d,H-2*d)\n        .extrude(h-2*d)\n        .faces('>Z').workplane()\n        .pushPoints(vpts)\n        .rect(d,d)\n        .cutBlind(-d)\n        .faces('<Z').workplane()\n        .rect(d,d).extrude(d)\n        .pushPoints([(0,-H/2+d-d/2,-(h-d)/2),(0,+H/2-d+d/2,-(h-d)/2)])\n        .box(d,d,d)\n    )\n\ndef make_spacer():\n    return (\n        cq.Workplane(\"XZ\")\n        .rect(delta-d,h-d)\n        .pushPoints([(-(delta-d)/2,h/2-d-d/2),((delta-d)/2,h/2-d-d/2)])\n        .rect(d,2*d)\n        .extrude(d)\n    )\n\nbase = make_base()\nside_l = make_divider()\nside_r = make_divider()\nfront_f = make_front()\nfront_b = make_front()\n\nassy = (\n    cq.Assembly(base,name='base',color=cq.Color(1,1,.4,0.5))\n    .add(side_l,name='side_l',loc=Loc(Vec(-(W-d)/2,0,d)))\n    .add(side_l,name='side_r',loc=Loc(Vec(+(W-d)/2,0,d)))\n    .add(front_f,name='front_f',loc=Loc(Vec(0,-(H-d)/2,d)))\n    .add(front_b,name='front_b',loc=Loc(Vec(0,(H-d)/2,d)))\n)\n\nfor i,p in enumerate(pts[1:-1]):\n    assy = assy.add(make_divider(),name=f'div{i}',loc=Loc(Vec(p,0,d)))\n\nfor i,p in enumerate(pts[1:]):\n    assy = assy.add(make_spacer(),name=f'div2{i}',loc=Loc(Vec(p-delta/2,d/2,d+(h)/2-d/2)))
+  Name of Part: Parametric box assembly with front, back, dividers and spacers
+  label: A configurable CadQuery assembly for a slotted box with dividers and spacers. The design includes a base with cutouts, front and back panels, and multiple vertical dividers with rectangular notches and screw bosses. Spacers are inserted between dividers. All components are assembled programmatically using locations computed from linearly spaced points across the width.
+- '#': '28'
+  Code: import cadquery as cq\n\n(L, w, t) = (20.0, 6.0, 3.0)\ns = cq.Workplane("XY")\n\np = (\n    s.center(-L/2.0, 0)\n    .vLine(w/2.0)\n    .threePointArc((L/2.0, w/2.0 + t), (L, w/2.0))\n    .vLine(-w/2.0)\n    .mirrorX()\n    .extrude(30.0, True)\n)\n\np = p.faces(">Z").workplane(centerOption="CenterOfMass").circle(3.0).extrude(2.0, True)\n\nresult = p.faces(">Z").shell(0.3)
+  Name of Part: Hollow bottle with arced profile and cylindrical neck
+  label: A hollow bottle with a length of 20 mm, width of 6 mm, and thickness of 3 mm. The bottle has an arced profile and a cylindrical neck with a diameter of 3 mm. The neck is extruded to a height of 2 mm, and the bottle is hollowed out with a shell operation of 0.3 mm.
+- '#': '29'
+  Code: |
+        import cadquery as cq
+
+        # Inputs
+        lbumps = 6  # number of bumps long
+        wbumps = 2  # number of bumps wide
+        thin = True  # True for thin, False for thick
+
+        # Lego Brick Constants
+        pitch = 8.0
+        clearance = 0.1
+        bumpDiam = 4.8
+        bumpHeight = 1.8
+        if thin:
+            height = 3.2
+        else:
+            height = 9.6
+
+        t = (pitch - (2 * clearance) - bumpDiam) / 2.0
+        postDiam = pitch - t  # works out to 6.5
+        total_length = lbumps * pitch - 2.0 * clearance
+        total_width = wbumps * pitch - 2.0 * clearance
+
+        # make the base
+        s = cq.Workplane("XY").box(total_length, total_width, height)
+
+        # shell inwards not outwards
+        s = s.faces("<Z").shell(-1.0 * t)
+
+        # make the bumps on the top
+        s = (
+            s.faces(">Z")
+            .workplane()
+            .rarray(pitch, pitch, lbumps, wbumps, True)
+            .circle(bumpDiam / 2.0)
+            .extrude(bumpHeight)
+        )
+
+        # add posts on the bottom. posts are different diameter depending on geometry
+        tmp = s.faces("<Z").workplane(invert=True)
+
+        if lbumps > 1 and wbumps > 1:
+            tmp = (
+                tmp.rarray(pitch, pitch, lbumps - 1, wbumps - 1, center=True)
+                .circle(postDiam / 2.0)
+                .circle(bumpDiam / 2.0)
+                .extrude(height - t)
+            )
+        elif lbumps > 1:
+            tmp = (
+                tmp.rarray(pitch, pitch, lbumps - 1, 1, center=True)
+                .circle(t)
+                .extrude(height - t)
+            )
+        elif wbumps > 1:
+            tmp = (
+                tmp.rarray(pitch, pitch, 1, wbumps - 1, center=True)
+                .circle(t)
+                .extrude(height - t)
+            )
+        else:
+            tmp = s
+  Name of Part: Lego brick base with bumps and posts
+  label: A rectangular Lego brick with customizable number of bumps in length and width, hollowed base with inward shell, bumps array extruded on top, and variable posts extruded on the bottom depending on brick size.
+#expert level examples - free style (DeepCAD dataset)
+- '#': '30'
+  Code: |
+    import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(0.0, -0.1953125, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.1773, 0.0)
+        .lineTo(0.1773, 0.3828)
+        .lineTo(0.0, 0.3828)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid0 = wp_sketch0.add(loop0).extrude(0.3047)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(0.1797, -0.1094, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop1 = (
+        wp_sketch1.moveTo(0.3782, 0.0)
+        .lineTo(0.5703, 0.1141)
+        .lineTo(0.3782, 0.2221)
+        .lineTo(0.0, 0.2221)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid1 = wp_sketch1.add(loop1).extrude(0.1797)
+    solid = solid.union(solid1)
+  Name of Part: A freestyle part
+  label: | 
+      Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (0.0, -0.19, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.177, 0.0), draw a line to point (0.177, 0.383), draw a line to point (0.0, 0.383), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 0, extrude the shapes (loop0) by 0.305 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (0.180, -0.109, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 1 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.3782072368421052, 0.0), draw a line to point (0.570, 0.114), draw a line to point (0.378, 0.222), draw a line to point (0.0, 0.22212171052631577), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop1) by 0.1796875 units along the normal direction and union the result with the existing solid.
+- '#': '31'
+  Code: |
+    import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5, -0.6015625, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.0, 0.0)
+        .threePointArc((0.0458, -0.1107), (0.1565, -0.1565))
+        .lineTo(0.8536, -0.1565)
+        .threePointArc((0.9572, -0.1077), (0.9959, 0.0))
+        .lineTo(0.9959, 1.1951)
+        .threePointArc((0.9572, 1.3028), (0.8536, 1.3516))
+        .lineTo(0.1565, 1.3516)
+        .threePointArc((0.0458, 1.3057), (0.0, 1.1951))
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.4979, 0.5975).circle(0.2561)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.15625)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.34375, 0.0, 0.15625),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop2 = wp_sketch1.moveTo(0.3474, 0.0).circle(0.3474)
+    loop3 = wp_sketch1.moveTo(0.3474, 0.0).circle(0.2461)
+    solid1 = wp_sketch1.add(loop2).add(loop3).extrude(0.140625)
+    solid = solid.union(solid1)
+  Name of Part: A freestyle part
+  label: | 
+        Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.5, -0.6015625, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.04583682527976966, -0.11065988524654614) to endpoint (0.1564967105263158, -0.1564967105263158), draw a line to point (0.8536184210526316, -0.1564967105263158), draw a three-point arc through midpoint (0.9571648194570725, -0.1077133825207835) to endpoint (0.995888157894737, 0.0), draw a line to point (0.995888157894737, 1.1950657894736842), draw a three-point arc through midpoint (0.9571648194570725, 1.3027791719944677) to endpoint (0.8536184210526316, 1.3515625), draw a line to point (0.1564967105263158, 1.3515625), draw a three-point arc through midpoint (0.04583682527976966, 1.3057256747202304) to endpoint (0.0, 1.1950657894736842), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.4979440789473685, 0.5975328947368421) and draw a circle with radius 0.2560855263157895. For sketch 0, extrude the shapes (loop0, loop1) by 0.15625 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.34375, 0.0, 0.15625), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 2 in sketch 1, create a closed shape by performing the following operation: move to (0.34736842105263155, 0.0) and draw a circle with radius 0.34736842105263155. For loop 3 in sketch 1, create a closed shape by performing the following operation: move to (0.34736842105263155, 0.0) and draw a circle with radius 0.24605263157894736. For sketch 1, extrude the shapes (loop2, loop3) by 0.140625 units along the normal direction and union the result with the existing solid.
+- '#': '32'
+  Code: |
+    import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.4765625, 0.0, -0.2734375),
+            cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17),
+            cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.9609, 0.0)
+        .lineTo(0.9609, 0.5361)
+        .lineTo(0.0, 0.5361)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = (
+        wp_sketch0.moveTo(0.0, 0.0)
+        .threePointArc((0.1012, -0.0405), (0.1416, 0.0607))
+        .lineTo(0.1416, 0.1821)
+        .threePointArc((0.1163, 0.2074), (0.0910, 0.1821))
+        .lineTo(0.0910, 0.0607)
+        .close()
+    )
+    loop2 = (
+        wp_sketch0.moveTo(0.0910, 0.0607)
+        .threePointArc((0.2681, 0.1871), (0.1416, 0.3641))
+        .lineTo(0.1416, 0.4855)
+        .threePointArc((0.1163, 0.5108), (0.0910, 0.4855))
+        .lineTo(0.0910, 0.3641)
+        .close()
+    )
+    loop3 = (
+        wp_sketch0.moveTo(0.0910, 0.3641)
+        .threePointArc((0.3287, -0.1770), (0.8699, 0.0607))
+        .lineTo(0.8699, 0.1821)
+        .threePointArc((0.8446, 0.2074), (0.8193, 0.1821))
+        .lineTo(0.8193, 0.0607)
+        .close()
+    )
+    loop4 = (
+        wp_sketch0.moveTo(0.8193, 0.0607)
+        .threePointArc((0.9963, 0.1871), (0.8699, 0.3641))
+        .lineTo(0.8699, 0.4855)
+        .threePointArc((0.8446, 0.5108), (0.8193, 0.4855))
+        .lineTo(0.8193, 0.3641)
+        .close()
+    )
+    solid0 = wp_sketch0.add(loop0).add(loop1).add(loop2).add(loop3).add(loop4).extrude(0.03125)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.015625, -0.03125, -0.2734375),
+            cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17),
+            cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17),
+        )
+    )
+    loop5 = (
+        wp_sketch1.moveTo(0.0284, 0.0)
+        .lineTo(0.0284, 0.5391)
+        .lineTo(0.0, 0.5391)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid1 = wp_sketch1.add(loop5).extrude(0.2421875)
+    solid = solid.union(solid1)
+  Name of Part: A freestyle part
+  label: |  
+        Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.4765625, 0.0, -0.2734375), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.9609375, 0.0), draw a line to point (0.9609375, 0.5361019736842105), draw a line to point (0.0, 0.5361019736842105), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.10115131578947369, -0.040460526315789475) to endpoint (0.14161184210526317, 0.06069078947368421), draw a line to point (0.14161184210526317, 0.18207236842105262), draw a three-point arc through midpoint (0.11632401315789474, 0.20736019736842107) to endpoint (0.09103618421052631, 0.18207236842105262), and draw a line to point (0.09103618421052631, 0.06069078947368421), and then close the loop. For loop 2 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.09103618421052631, 0.06069078947368421) and draw a three-point arc through midpoint (0.26805098684210527, 0.18712993421052632) to endpoint (0.14161184210526317, 0.36414473684210524), draw a line to point (0.14161184210526317, 0.4855263157894737), draw a three-point arc through midpoint (0.11632401315789474, 0.5108141447368422) to endpoint (0.09103618421052631, 0.4855263157894737), and draw a line to point (0.09103618421052631, 0.36414473684210524), and then close the loop. For loop 3 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.09103618421052631, 0.36414473684210524) and draw a three-point arc through midpoint (0.3287417763157895, -0.17701480263157895) to endpoint (0.8699013157894737, 0.06069078947368421), draw a line to point (0.8699013157894737, 0.18207236842105262), draw a three-point arc through midpoint (0.8446134868421052, 0.20736019736842107) to endpoint (0.8193256578947369, 0.18207236842105262), and draw a line to point (0.8193256578947369, 0.06069078947368421), and then close the loop. For loop 4 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.8193256578947369, 0.06069078947368421) and draw a three-point arc through midpoint (0.9963404605263159, 0.18712993421052632) to endpoint (0.8699013157894737, 0.36414473684210524), draw a line to point (0.8699013157894737, 0.4855263157894737), draw a three-point arc through midpoint (0.8446134868421052, 0.5108141447368422) to endpoint (0.8193256578947369, 0.4855263157894737), and draw a line to point (0.8193256578947369, 0.36414473684210524), and then close the loop. For sketch 0, extrude the shapes (loop0, loop1, loop2, loop3, loop4) by 0.03125 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.015625, -0.03125, -0.2734375), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 5 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.02837171052631579, 0.0), draw a line to point (0.02837171052631579, 0.5390625), draw a line to point (0.0, 0.5390625), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop5) by 0.2421875 units along the normal direction and union the result with the existing solid.
+- '#': '33'
+  Code: |
+    import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.46875, 0.25, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.5, 0.0)
+        .lineTo(0.5, 0.1737)
+        .lineTo(0.4053, 0.1737)
+        .lineTo(0.4053, 0.3263)
+        .lineTo(0.5, 0.3263)
+        .lineTo(0.5, 0.5)
+        .lineTo(0.0, 0.5)
+        .lineTo(0.0, 0.3263)
+        .lineTo(0.0947, 0.3263)
+        .lineTo(0.0947, 0.1737)
+        .lineTo(0.0, 0.1737)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.2526, 0.2526).circle(0.0579)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.125)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.46875, 0.0, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop2 = (
+        wp_sketch1.moveTo(0.5, 0.0)
+        .lineTo(0.5, 0.2526)
+        .lineTo(0.0, 0.2526)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop3 = wp_sketch1.moveTo(0.2526, 0.1263).circle(0.0632)
+    solid1 = wp_sketch1.add(loop2).add(loop3).extrude(0.125)
+    solid = solid.union(solid1)
+
+    # Generating a workplane for sketch 2
+    wp_sketch2 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.46875, 0.4296875, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop4 = (
+        wp_sketch2.moveTo(0.09375, 0.0)
+        .lineTo(0.09375, 0.1484)
+        .lineTo(0.0, 0.1484)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid2 = wp_sketch2.add(loop4).extrude(0.25)
+    solid = solid.union(solid2)
+
+    # Generating a workplane for sketch 3
+    wp_sketch3 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.0625, 0.4296875, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop5 = (
+        wp_sketch3.moveTo(0.09375, 0.0)
+        .lineTo(0.09375, 0.1484)
+        .lineTo(0.0, 0.1484)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid3 = wp_sketch3.add(loop5).extrude(0.25)
+    solid = solid.union(solid3)
+  Name of Part: A freestyle part
+  label: | 
+        Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.46875, 0.25, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.5, 0.0), draw a line to point (0.5, 0.17368421052631577), draw a line to point (0.4052631578947368, 0.17368421052631577), draw a line to point (0.4052631578947368, 0.3263157894736842), draw a line to point (0.5, 0.3263157894736842), draw a line to point (0.5, 0.5), draw a line to point (0.0, 0.5), draw a line to point (0.0, 0.3263157894736842), draw a line to point (0.09473684210526316, 0.3263157894736842), draw a line to point (0.09473684210526316, 0.17368421052631577), draw a line to point (0.0, 0.17368421052631577), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.25263157894736843, 0.25263157894736843) and draw a circle with radius 0.05789473684210526. For sketch 0, extrude the shapes (loop0, loop1) by 0.125 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.46875, 0.0, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 2 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.5, 0.0), draw a line to point (0.5, 0.25263157894736843), draw a line to point (0.0, 0.25263157894736843), and draw a line to point (0.0, 0.0), and then close the loop. For loop 3 in sketch 1, create a closed shape by performing the following operation: move to (0.25263157894736843, 0.12631578947368421) and draw a circle with radius 0.06315789473684211. For sketch 1, extrude the shapes (loop2, loop3) by 0.125 units along the normal direction and union the result with the existing solid. For sketch 2, create a workplane with an origin at coordinates (-0.46875, 0.4296875, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 4 in sketch 2, create a closed shape by performing the following operations in sequence: move to point (0.09375, 0.0), draw a line to point (0.09375, 0.1484375), draw a line to point (0.0, 0.1484375), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 2, extrude the shapes (loop4) by 0.25 units along the normal direction and union the result with the existing solid. For sketch 3, create a workplane with an origin at coordinates (-0.0625, 0.4296875, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 5 in sketch 3, create a closed shape by performing the following operations in sequence: move to point (0.09375, 0.0), draw a line to point (0.09375, 0.1484375), draw a line to point (0.0, 0.1484375), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 3, extrude the shapes (loop5) by 0.25 units along the normal direction and union the result with the existing solid.
+- '#': '34'
+  Code: |
+    import cadquery as cq
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5625, -0.375, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(1.125, 0.0)
+        .lineTo(1.125, 0.7461)
+        .lineTo(0.0, 0.7461)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.5684, 0.379).circle(0.1895)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.1875)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5234, -0.375, 0.1875),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop2 = (
+        wp_sketch1.moveTo(0.0947, 0.0)
+        .lineTo(0.0947, 0.75)
+        .lineTo(0.0, 0.75)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid1 = wp_sketch1.add(loop2).extrude(-0.0391)
+    solid = solid.cut(solid1)
+
+    # Generating a workplane for sketch 2
+    wp_sketch2 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.09375, 0.1641, 0.1875),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop3 = (
+        wp_sketch2.moveTo(0.0, 0.0)
+        .threePointArc((0.0933, 0.0252), (0.1865, 0.0))
+        .lineTo(0.1865, 0.2109)
+        .lineTo(0.0, 0.2109)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid2 = wp_sketch2.add(loop3).extrude(-0.0391)
+    solid = solid.cut(solid2)
+
+    # Generating a workplane for sketch 3
+    wp_sketch3 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.09375, -0.375, 0.1875),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop4 = (
+        wp_sketch3.moveTo(0.1865, 0.0)
+        .lineTo(0.1865, 0.2109)
+        .threePointArc((0.0933, 0.1857), (0.0, 0.2109))
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid3 = wp_sketch3.add(loop4).extrude(-0.0391)
+    solid = solid.cut(solid3)
+  Name of Part: A freestyle part
+  label: | 
+        Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.5625, -0.375, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (1.125, 0.0), draw a line to point (1.125, 0.7460526315789474), draw a line to point (0.0, 0.7460526315789474), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.5684210526315789, 0.37894736842105264) and draw a circle with radius 0.18947368421052632. For sketch 0, extrude the shapes (loop0, loop1) by 0.1875 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.5234375, -0.375, 0.1875), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 2 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.09473684210526316, 0.0), draw a line to point (0.09473684210526316, 0.75), draw a line to point (0.0, 0.75), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop2) by -0.0390625 units along the normal direction and cut the result from the existing solid. For sketch 2, create a workplane with an origin at coordinates (-0.09375, 0.1640625, 0.1875), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 3 in sketch 2, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.09325657894736841, 0.025192570203331616) to endpoint (0.18651315789473683, 0.0), draw a line to point (0.18651315789473683, 0.2109375), draw a line to point (0.0, 0.2109375), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 2, extrude the shapes (loop3) by -0.0390625 units along the normal direction and cut the result from the existing solid. For sketch 3, create a workplane with an origin at coordinates (-0.09375, -0.375, 0.1875), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 4 in sketch 3, create a closed shape by performing the following operations in sequence: move to point (0.18651315789473683, 0.0), draw a line to point (0.18651315789473683, 0.2109375), draw a three-point arc through midpoint (0.09325657894736841, 0.18574492979666832) to endpoint (0.0, 0.2109375), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 3, extrude the shapes (loop4) by -0.0390625 units along the normal direction and cut the result from the existing solid.
+- '#': '35'
+  Code: |
+    import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5859, 0.0, 0.0391),
+            cq.Vector(1.0, 6.12e-17, -6.12e-17),
+            cq.Vector(6.12e-17, -1.0, 6.12e-17),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.2921, 0.0)
+        .lineTo(0.5781, 0.0)
+        .lineTo(0.4808, 0.2799)
+        .threePointArc((0.2891, 0.4277), (0.0974, 0.2799))
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.2921, 0.2252).circle(0.1156)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.4531)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.75, 0.0, -0.03125),
+            cq.Vector(1.0, 6.12e-17, -6.12e-17),
+            cq.Vector(6.12e-17, -1.0, 6.12e-17),
+        )
+    )
+    loop2 = (
+        wp_sketch1.moveTo(0.4539, 0.0)
+        .lineTo(0.8984, 0.0)
+        .lineTo(0.8984, 0.0662)
+        .lineTo(0.7377, 0.0662)
+        .lineTo(0.4539, 0.0662)
+        .lineTo(0.1608, 0.0662)
+        .lineTo(0.0, 0.0662)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid1 = wp_sketch1.add(loop2).extrude(0.4531)
+    solid = solid.union(solid1)
+
+    # Generating a workplane for sketch 2
+    wp_sketch2 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.4141, 0.0, 0.2578),
+            cq.Vector(1.0, 6.12e-17, -6.12e-17),
+            cq.Vector(6.12e-17, -1.0, 6.12e-17),
+        )
+    )
+    loop3 = wp_sketch2.moveTo(0.1105, 0.0).circle(0.1082)
+    loop4 = wp_sketch2.moveTo(0.1105, 0.0).circle(0.0806)
+    solid2 = wp_sketch2.add(loop3).add(loop4).extrude(0.5156)
+    solid = solid.union(solid2)
+
+    # Generating a workplane for sketch 3
+    wp_sketch3 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.7109, -0.2266, 0.0391),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop5 = wp_sketch3.moveTo(0.0395, 0.0).circle(0.0395)
+    solid3 = wp_sketch3.add(loop5).extrude(0.0781, both=True)
+    solid = solid.cut(solid3)
+
+    # Generating a workplane for sketch 4
+    wp_sketch4 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(0.03125, -0.2266, 0.0391),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop6 = wp_sketch4.moveTo(0.0387, 0.0).circle(0.0387)
+    solid4 = wp_sketch4.add(loop6).extrude(0.0781, both=True)
+    solid = solid.cut(solid4)
+  Name of Part: A freestyle part
+  label: |  
+        Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.5859375, 0.0, 0.0390625), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.29210526315789476, 0.0), draw a line to point (0.578125, 0.0), draw a line to point (0.4807565789473684, 0.2799342105263158), draw a three-point arc through midpoint (0.2890625, 0.42765015331427847) to endpoint (0.09736842105263158, 0.2799342105263158), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.29210526315789476, 0.22516447368421053) and draw a circle with radius 0.11562499999999999. For sketch 0, extrude the shapes (loop0, loop1) by 0.453125 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.75, 0.0, -0.03125), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 2 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.45394736842105265, 0.0), draw a line to point (0.8984375, 0.0), draw a line to point (0.8984375, 0.06620065789473684), draw a line to point (0.7376644736842105, 0.06620065789473684), draw a line to point (0.45394736842105265, 0.06620065789473684), draw a line to point (0.16077302631578946, 0.06620065789473684), draw a line to point (0.0, 0.06620065789473684), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop2) by 0.453125 units along the normal direction and union the result with the existing solid. For sketch 2, create a workplane with an origin at coordinates (-0.4140625, 0.0, 0.2578125), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 3 in sketch 2, create a closed shape by performing the following operation: move to (0.11052631578947367, 0.0) and draw a circle with radius 0.1082236842105263. For loop 4 in sketch 2, create a closed shape by performing the following operation: move to (0.11052631578947367, 0.0) and draw a circle with radius 0.08059210526315788. For sketch 2, extrude the shapes (loop3, loop4) by 0.515625 units along the normal direction and union the result with the existing solid. For sketch 3, create a workplane with an origin at coordinates (-0.7109375, -0.2265625, 0.0390625), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 5 in sketch 3, create a closed shape by performing the following operation: move to (0.039473684210526314, 0.0) and draw a circle with radius 0.039473684210526314. For sketch 3, extrude the shapes (loop5) symmetrically by 0.078125 units in both directions along the normal and cut the result from the existing solid. For sketch 4, create a workplane with an origin at coordinates (0.03125, -0.2265625, 0.0390625), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 6 in sketch 4, create a closed shape by performing the following operation: move to (0.039473684210526314, 0.0) and draw a circle with radius 0.03865131578947368. For sketch 4, extrude the shapes (loop6) symmetrically by 0.078125 units in both directions along the normal and cut the result from the existing solid.
+#tool calls (examples using custom tools)

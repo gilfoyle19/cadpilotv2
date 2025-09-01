@@ -1,0 +1,1353 @@
+cadquery_cheatsheet:
+"All dimensions are in mm"
+
+#section: Importing CadQuery
+
+#code:
+import cadquery as cq
+=========================================================================================================================
+#section: Workplane creation
+
+#description:
+A workplane is a 2D reference plane on which you create sketches, shapes, or transformations in a 3D space. It's essentially your "drawing surface" — like a sheet of paper placed in 3D space.
+
+#rule:
+If the user prompt is of the form:  
+"Create a workplane in [plane name] plane"  
+Then use the following method:
+
+#method:
+cq.Workplane("plane_name")
+
+#allowed_plane_names:
+- XY
+- YZ
+- XZ
+- front
+- back
+- left
+- right
+- top
+- bottom
+
+#examples:
+- #prompt: Create a workplane in "front" plane
+  #output:
+  cq.Workplane("front")
+
+- #prompt: Create a workplane in "XY" plane
+  #output:
+  cq.Workplane("XY")
+
+#rule:
+If the user prompt is of the form:  
+"Create a workplane with an origin at coordinates (x, y, z), direction vector at (x1, y1, z1), and normal vector at (x2, y2, z2)"  
+Then use the following method:
+
+#method:
+cq.Workplane(cq.Plane(cq.Vector(x, y, z), cq.Vector(x1, y1, z1), cq.Vector(x2, y2, z2)))
+
+#example:
+- #prompt: Create a workplane with an origin at coordinates (-0.2265625, 0.4609375, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0)
+  #output:
+  cq.Workplane(cq.Plane(cq.Vector(-0.2265625, 0.4609375, 0.0), cq.Vector(1.0, 0.0, 0.0), cq.Vector(0.0, 0.0, 1.0)))
+
+#section: Workplane Operations
+
+#description:
+Workplane operations which will be shown below are used to create 2D constructs that can be used to create 3D features. Remember all 2D operations require a Workplane object to be created.
+
+
+#rule:
+Use when user wants to set or shift the origin to (x, y) within the workplane.
+
+#method:
+.center(x, y)
+
+#examples:
+- #prompt: Shift the workplane origin to (5, -3)
+  #output:
+  .center(5, -3)
+
+
+#rule:
+Use when user wants to mirror entities about the Y-axis.
+
+#method:
+.mirrorY()
+
+#examples:
+- #prompt: Mirror sketch about Y axis
+  #output:
+  .mirrorY()
+
+#rule:
+Use when user wants to mirror entities about the X-axis.
+
+#method:
+.mirrorX()
+
+#examples:
+- #prompt: Mirror sketch about X axis
+  #output:
+  .mirrorX()
+
+#rule:
+Use when user wants to join all pending edges into a wire.
+
+#method:
+.wire()
+
+#examples:
+- #prompt: Connect all edges into a single wire
+  #output:
+  .wire()
+
+#rule:
+Whenever the sketch is completed with a series of lines, arcs, splines and parametric curves, always close the curve (even if user not mentions it in the prompt)
+#method:
+.close()
+
+#examples:
+  #output:
+  sketch = cq.Workplane("XY").moveTo(0.0, 0.0).threePointArc((0.2, -0.17), (0.45, 0.0)).threePointArc((0.42, 0.012), (0.39, 0.023)).threePointArc((0.22, -0.11), (0.05, 0.02)).threePointArc((0.028, 0.012), (0.0, 0.0)).close()
+
+#rule:
+Use when the user wants to move all items on the stack by a given vector.
+
+#method:
+.translate((x, y, z))
+
+#allowed_values:
+- vec: Translation vector (x, y, z)
+
+#examples:
+- #prompt: Move the object 10 units in X, 0 in Y, and -5 in Z
+  #output:
+  .translate((10, 0, -5))
+
+- #prompt: Translate geometry by vector (0, 15, 2)
+  #output:
+  .translate((0, 15, 2))
+
+#rule:
+Use when the user wants to rotate geometry around a custom axis defined by two points.
+
+#method:
+.rotate((x1, y1, z1), (x2, y2, z2), angleDegrees)
+
+#allowed_values:
+- axisStartPoint: Starting point of the axis (x1, y1, z1)
+- axisEndPoint: Ending point of the axis (x2, y2, z2)
+- angleDegrees: Rotation angle in degrees
+
+#examples:
+- #prompt: Rotate objects 90 degrees around axis from (0, 0, 0) to (0, 0, 1)
+  #output:
+  .rotate((0, 0, 0), (0, 0, 1), 90)
+
+#rule:
+Use when the user wants to rotate geometry about its center, around an axis defined by a vector from origin to axisEndPoint.
+
+#method:
+.rotateAboutCenter((x, y, z), angleDegrees)
+
+#allowed_values:
+- axisEndPoint: Rotation axis vector endpoint (x, y, z)
+- angleDegrees: Rotation angle in degrees
+
+#examples:
+- #prompt: Rotate object about center around Z-axis by 180 degrees
+  #output:
+  .rotateAboutCenter((0, 0, 1), 180)
+
+- #prompt: Rotate the geometry about its center around (1, 0, 0) by 45 degrees
+  #output:
+  .rotateAboutCenter((1, 0, 0), 45)
+
+#rule:
+Use when user wants to place a predefined sketch at each point on the stack.
+
+#method:
+.placeSketch(sketch1, sketch2, ...)
+
+#examples:
+- #prompt: Place a sketch at current array points
+  #output:
+  .placeSketch(sketch)
+
+==================================================================================================================
+
+#section: 2D construction
+
+#description: To create 2D sketches like lines, Arcs, rectangles, circles, splines, parametric curves etc. 
+
+#rule:
+Use when the user wants to create a rectangle on the workplane.
+
+#method:
+.rect(xLen, yLen[, centered=True])
+
+#allowed_values:
+- xLen, yLen: Dimensions of the rectangle
+- centered: Optional (default True); if False, rectangle is drawn from lower-left corner
+
+#examples:
+- #prompt: Draw a 20x10 rectangle centered at the origin
+  #output:
+  .rect(20, 10)
+
+- #prompt: Draw a 15 by 5 rectangle from corner
+  #output:
+  .rect(15, 5, centered=False)
+
+#rule:
+Use to draw a circle with the given radius.
+
+#method:
+.circle(radius[, forConstruction=False])
+
+#allowed_values:
+- radius: Radius of the circle
+- forConstruction: Optional; if True, marks circle for construction only
+
+#examples:
+- #prompt: Draw a circle with radius 8
+  #output:
+  .circle(8)
+
+- #prompt: Draw a construction circle with radius 5
+  #output:
+  .circle(5, forConstruction=True)
+
+#rule:
+Use to draw an ellipse with the given X and Y radii.
+
+#method:
+.ellipse(x_radius, y_radius)
+
+#examples:
+- #prompt: Draw an ellipse with radii 10 and 4
+  #output:
+  .ellipse(10, 4)
+
+#rule:
+Use to draw an elliptical arc with the specified radii.
+
+#method:
+.ellipseArc(x_radius, y_radius)
+
+#examples:
+- #prompt: Draw an elliptical arc with x-radius 8 and y-radius 3
+  #output:
+  .ellipseArc(8, 3)
+
+#rule:
+Use when the user wants to create a polyline through multiple points.
+
+#method:
+.polyline([(x1, y1), (x2, y2), ...])
+
+#examples:
+- #prompt: Draw a polyline through (0, 0), (4, 4), and (8, 0)
+  #output:
+  .polyline([(0, 0), (4, 4), (8, 0)])
+
+#rule:
+Use to generate a rectangular array of points.
+
+#method:
+.rarray(xSpacing, ySpacing, xCount, yCount)
+
+#examples:
+- #prompt: Create a 3x2 array with spacing 10 in X and 5 in Y
+  #output:
+  .rarray(10, 5, 3, 2)
+
+#rule:
+Use when the user wants to place points in a circular pattern.
+
+#method:
+.polarArray(radius, startAngle, count, totalAngle)
+
+#examples:
+- #prompt: Create 8 points around a circle of radius 20 starting at angle 0
+  #output:
+  .polarArray(20, 0, 8, 360)
+
+#rule:
+Use to draw a rounded slot shape.
+
+#method:
+.slot2D(length, diameter[, angle=0])
+
+#examples:
+- #prompt: Create a horizontal slot 12 units long and 4 units in diameter
+  #output:
+  .slot2D(12, 4)
+
+- #prompt: Create a slot 20x6 rotated at 45 degrees
+  #output:
+  .slot2D(20, 6, angle=45)
+
+#rule:
+Use when user wants to draw a line to a specific coordinate (x, y).
+
+#method:
+.lineTo(x, y)
+
+#examples:
+- #prompt: Draw a line to point (10, 5)
+  #output:
+  .lineTo(10, 5)
+
+#rule:
+Use when the user specifies a relative offset line to the current point.
+
+#method:
+.line(xDist, yDist)
+
+#examples:
+- #prompt: Draw a line 5 units right and 3 units up
+  #output:
+  .line(5, 3)
+
+#description:
+Draw a vertical line relative to the current point.
+
+#method:
+.vLine(distance)
+
+#examples:
+- #prompt: Draw a vertical line upwards by 10 units
+  #output:
+  .vLine(10)
+
+#description:
+Draw a vertical line to an absolute Y-coordinate.
+
+#method:
+.vLineTo(yCoord)
+
+#examples:
+- #prompt: Draw a vertical line to Y = 15
+  #output:
+  .vLineTo(15)
+
+
+#description:
+Draw a horizontal line relative to the current point.
+
+#method:
+.hLine(distance)
+
+#examples:
+- #prompt: Draw a horizontal line 8 units to the right
+  #output:
+  .hLine(8)
+
+#description:
+Draw a horizontal line to an absolute X-coordinate.
+
+#method:
+.hLineTo(xCoord)
+
+#examples:
+- #prompt: Draw a horizontal line to X = -10
+  #output:
+  .hLineTo(-10)
+
+#description:
+Draw a line from current point at given angle and distance.
+
+#method:
+.polarLine(distance, angle)
+
+#examples:
+- #prompt: Draw a line 10 units at 45 degrees
+  #output:
+  .polarLine(10, 45)
+
+
+#description:
+Draw a line from current point to a point defined by polar coordinates.
+
+#method:
+.polarLineTo(distance, angle)
+
+#examples:
+- #prompt: Draw to polar coordinates with radius 20 and angle 30
+  #output:
+  .polarLineTo(20, 30)
+
+
+#description:
+Move to a point (x, y) without drawing a line.
+
+#method:
+.moveTo(x, y)
+
+#examples:
+- #prompt: Move to (5, 5)
+  #output:
+  .moveTo(5, 5)
+
+#description:
+Move relative to the current point, without drawing.
+
+#method:
+.move(xDist, yDist)
+
+#examples:
+- #prompt: Move 3 units right and 4 units up
+  #output:
+  .move(3, 4)
+
+#rule:
+Use when the user wants to create a spline through multiple 2D or 3D points.
+
+#method:
+.spline([(x1, y1), (x2, y2), ...])
+
+#examples:
+- #prompt: Create a spline through points (0, 0), (5, 5), and (10, 0)
+  #output:
+  .spline([(0, 0), (5, 5), (10, 0)])
+
+#rule:
+Use when user asks to create a curve from a mathematical function of one parameter.
+
+#method:
+.parametricCurve(func, N)
+
+#examples:
+- #prompt: Create a parametric curve using lambda t: (t, t*t) with 50 points
+  #output:
+  .parametricCurve(lambda t: (t, t*t), N=50)
+
+#rule:
+Use when user wants to define a surface using a function of two variables.
+
+#method:
+.parametricSurface(func, N)
+
+#examples:
+- #prompt: Create a parametric surface using lambda u,v: (u,v,u*v) with 10 steps
+  #output:
+  .parametricSurface(lambda u, v: (u, v, u*v), N=10)
+
+#rule:
+Use when user provides a sagitta to define the arc.
+
+#method:
+.sagittaArc((x, y), sag)
+
+#examples:
+- #prompt: Draw an arc to (10, 0) with sagitta 3
+  #output:
+  .sagittaArc((10, 0), 3)
+
+#rule:
+Use when user defines an arc using radius and endpoint.
+
+#method:
+.radiusArc((x, y), radius)
+
+#examples:
+- #prompt: Draw an arc to (5, 5) with radius 10
+  #output:
+  .radiusArc((5, 5), 10)
+
+#rule:
+Use when user wants to draw a tangent arc ending at a specific point.
+
+#method:
+.tangentArcPoint((x, y))
+
+#examples:
+- #prompt: Draw a tangent arc ending at (8, 8)
+  #output:
+  .tangentArcPoint((8, 8))
+
+#rule:
+Use when user wants to construct an elliptical face with specified radii.
+
+#method:
+.ellipse(a1, a2[, angle=0, mode='arc', tag=None])
+
+#allowed_values:
+- a1, a2: Major and minor radii
+- angle: Optional rotation angle in degrees
+- mode: Optional mode, e.g., 'arc' or 'segment'
+- tag: Optional string tag
+
+#examples:
+- #prompt: Create an ellipse with radii 10 and 5 rotated 30 degrees
+  #output:
+  .ellipse(10, 5, angle=30)
+
+#rule:
+Use to create a trapezoidal face with specified width, height, and base angles.
+
+#method:
+.trapezoid(w, h, a1[, a2=0, angle=0])
+
+#allowed_values:
+- w: Width
+- h: Height
+- a1, a2: Base angles in degrees (a2 optional, defaults to 0)
+- angle: Optional rotation
+
+#examples:
+- #prompt: Create a trapezoid width 10, height 5, base angle 20 degrees
+  #output:
+  .trapezoid(10, 5, 20)
+
+#rule:
+Use to create a slot-shaped face.
+
+#method:
+.slot(w, h[, angle=0, mode='arc', tag=None])
+
+#allowed_values:
+- w: Length of slot
+- h: Width of slot
+- angle: Optional rotation
+- mode: Optional mode for ends
+- tag: Optional string tag
+
+#examples:
+- #prompt: Create a horizontal slot 15 long and 4 wide
+  #output:
+  .slot(15, 4)
+
+#rule:
+Use to create a regular polygon face with n sides inscribed in radius r.
+
+#method:
+.regularPolygon(r, n[, angle=0, mode='arc', tag=None])
+
+#allowed_values:
+- r: Radius of circumscribed circle
+- n: Number of sides
+- angle: Optional rotation
+- mode: Optional mode
+- tag: Optional string tag
+
+#examples:
+- #prompt: Create a hexagon with radius 10
+  #output:
+  .regularPolygon(10, 6)
+
+#rule:
+Use to create a polygonal face from a list of points.
+
+#method:
+.polygon([(x1, y1), (x2, y2), ...][, angle=0, mode='arc', tag=None])
+
+#allowed_values:
+- pts: List of 2D points
+- angle: Optional rotation
+- mode: Optional mode
+- tag: Optional string tag
+
+#examples:
+- #prompt: Create a polygon from points (0,0), (5,5), (10,0)
+  #output:
+  .polygon([(0, 0), (5, 5), (10, 0)])
+
+#rule:
+Use to generate a rectangular grid of points.
+
+#method:
+.rarray(xs, ys, nx, ny)
+
+#allowed_values:
+- xs, ys: Spacing in X and Y directions
+- nx, ny: Number of points in X and Y
+
+#examples:
+- #prompt: Create a 4x3 array with 10 spacing in X and 5 in Y
+  #output:
+  .rarray(10, 5, 4, 3)
+
+#rule:
+Use to generate points in a circular (polar) pattern.
+
+#method:
+.parray(r, a1, da, n[, rotate=False])
+
+#allowed_values:
+- r: Radius
+- a1: Start angle in degrees
+- da: Angle increment in degrees
+- n: Number of points
+- rotate: Optional boolean to rotate points
+
+#examples:
+- #prompt: Create 8 points on a circle of radius 20 starting at 0 degrees, 45 degree steps
+  #output:
+  .parray(20, 0, 45, 8)
+
+#rule:
+Use when user wants to offset selected wires or edges by a specified distance.
+
+#method:
+.offset(d[, mode='arc', tag=None])
+
+#allowed_values:
+- d: Offset distance (positive or negative)
+- mode: Optional, offset mode (e.g., 'arc', 'intersection', 'tangent')
+- tag: Optional string tag
+
+#examples:
+- #prompt: Offset wires outward by 2 units
+  #output:
+  .offset(2)
+
+- #prompt: Offset wires inward by 1 unit using tangent mode
+  #output:
+  .offset(-1, mode='tangent')
+
+#rule:
+Use when user wants to add a fillet (rounded corner) to the current selection with specified radius.
+
+#method:
+.fillet(d)
+
+#allowed_values:
+- d: Radius of fillet
+
+#examples:
+- #prompt: Add a fillet with radius 5
+  #output:
+  .fillet(5)
+
+#rule:
+Use when user wants to add a chamfer (beveled corner) to the current selection with specified distance.
+
+#method:
+.chamfer(d)
+
+#allowed_values:
+- d: Chamfer distance
+
+#examples:
+- #prompt: Add a chamfer with distance 3
+  #output:
+  .chamfer(3)
+
+#rule:
+Use when user wants to remove internal or redundant wires from the sketch.
+
+#method:
+.clean()
+
+#examples:
+- #prompt: Clean the sketch to remove internal wires
+  #output:
+  .clean()
+
+===========================================================================================================================
+
+#section: 3D construction 
+
+#description: Used to create 3D objects like box, cylinder, sphere etc.
+
+#rule:
+Use when user wants to create a rectangular box solid.
+
+#method:
+.box(length, width, height)
+
+#allowed_values:
+- length, width, height: Dimensions of the box along X, Y, and Z axes respectively (floats)
+
+#examples:
+- #prompt: Create a box 10x20x30
+  #output:
+  .box(10, 20, 30)
+
+#rule:
+Use when user wants to create a sphere solid.
+
+#method:
+.sphere(radius)
+
+#allowed_values:
+- radius: Radius of the sphere (float)
+
+#examples:
+- #prompt: Create a sphere with radius 15
+  #output:
+  .sphere(15)
+
+#rule:
+Use when user wants to create a cylindrical solid.
+
+#method:
+.cylinder(height, radius)
+
+#allowed_values:
+- height: Height of the cylinder (float)
+- radius: Radius of the cylinder base (float)
+
+#examples:
+- #prompt: Create a cylinder with height 20 and radius 5
+  #output:
+  .cylinder(20, 5)
+
+#rule:
+Use when user wants to create 3D text on the workplane.
+
+#method:
+.text(txt, fontsize, distance)
+
+#allowed_values:
+- txt: Text string to create
+- fontsize: Font size in units
+- distance: Extrusion distance (thickness) of the text
+
+#examples:
+- #prompt: Create 3D text "Hello" with font size 10 and thickness 2
+  #output:
+  .text("Hello", 10, 2)
+
+#rule:
+Use when user wants to create a 3D wedge solid with specified dimensions.
+
+#method:
+.wedge(dx, dy, dz, xmin, zmin[, centered=True])
+
+#allowed_values:
+- dx, dy, dz: Dimensions of the wedge along X, Y, and Z axes respectively (floats)
+- xmin, zmin: Minimum X and Z coordinates relative to the workplane origin (floats)
+- centered: Optional boolean (default True) indicating if wedge is centered on Y axis
+
+#examples:
+- #prompt: Create a wedge 10x20x30 with xmin=0 and zmin=0
+  #output:
+  .wedge(10, 20, 30, 0, 0)
+
+- #prompt: Create a wedge 5x10x15, xmin=-2, zmin=1, centered on Y axis
+  #output:
+  .wedge(5, 10, 15, -2, 1, centered=True)
+
+
+#section: 3D operations
+
+#description: Used to perform 3D operations on 2D Workplane 
+
+#rule:
+Use when user wants to create a counterbored hole on the workplane.
+
+#method:
+.cboreHole(diameter, cboreDiameter[, depth=None, ...])
+
+#allowed_values:
+- diameter: Diameter of the through hole
+- cboreDiameter: Diameter of the counterbore
+- depth: Optional depth of the hole
+
+#examples:
+- #prompt: Create a counterbored hole with 5mm hole diameter and 10mm counterbore diameter
+  #output:
+  .cboreHole(5, 10)
+
+#rule:
+Use when user wants to create a countersunk hole on the workplane.
+
+#method:
+.cskHole(diameter, cskDiameter[, depth=None, ...])
+
+#allowed_values:
+- diameter: Diameter of the through hole
+- cskDiameter: Diameter of the countersink
+- depth: Optional depth of the hole
+
+#examples:
+- #prompt: Create a countersunk hole with 4mm hole diameter and 8mm countersink diameter
+  #output:
+  .cskHole(4, 8)
+
+#rule:
+Use when user wants to drill a simple hole.
+
+#method:
+.hole(diameter[, depth=None, clean=True])
+
+#allowed_values:
+- diameter: Hole diameter
+- depth: Optional hole depth, defaults through entire solid if None
+- clean: Optional boolean to clean result
+
+#examples:
+- #prompt: Create a 6mm hole through the entire solid
+  #output:
+  .hole(6)
+
+- #prompt: Create a 3mm hole with 10mm depth
+  #output:
+  .hole(3, 10)
+
+#rule:
+Use when user wants to extrude all un-extruded wires to make prismatic solids.
+
+#method:
+.extrude(until[, combine=True, clean=True, ...])
+
+#allowed_values:
+- until: Extrusion length or until condition (e.g., a plane)
+- combine: Optional boolean to combine with existing solid
+- clean: Optional boolean to clean the geometry
+
+#examples:
+- #prompt: Extrude the sketch by 20 units
+  #output:
+  .extrude(20)
+
+#rule:
+Use when user wants to subtract a solid from the current solid.
+
+#method:
+.cut(toCut[, clean=True, tol=1e-6])
+
+#allowed_values:
+- toCut: Solid to subtract
+- clean: Optional boolean to clean after operation
+- tol: Optional tolerance
+
+#examples:
+- #prompt: Subtract cylinder from the current solid
+  #output:
+  .cut(cylinder)
+
+#rule:
+Use to create a blind cut extrusion (cut of specified length) from un-extruded wires.
+
+#method:
+.cutBlind(until[, clean=True, both=False, taper=0])
+
+#allowed_values:
+- until: Cut length
+- clean: Optional boolean
+- both: Optional boolean to cut both directions
+- taper: Optional taper angle in degrees
+
+#examples:
+- #prompt: Cut blind 10 units into the solid
+  #output:
+  .cutBlind(10)
+
+#rule:
+Use to cut through the entire solid with all un-extruded wires.
+
+#method:
+.cutThruAll([clean=True, taper=0])
+
+#allowed_values:
+- clean: Optional boolean
+- taper: Optional taper angle
+
+#examples:
+- #prompt: Cut through entire solid
+  #output:
+  .cutThruAll()
+
+#rule:
+Use to union all items on the stack or with provided solid.
+
+#method:
+.union([toUnion=None, clean=True, glue=True, tol=1e-6])
+
+#allowed_values:
+- toUnion: Optional solid(s) to union with
+- clean: Optional boolean
+- glue: Optional boolean to glue solids
+- tol: Optional tolerance
+
+#examples:
+- #prompt: Union all items on stack
+  #output:
+  .union()
+
+- #prompt: Union current solid with another solid
+  #output:
+  .union(otherSolid)
+
+#rule:
+Use to combine all items on the stack into a single object.
+
+#method:
+.combine([clean=True, glue=True, tol=1e-6])
+
+#allowed_values:
+- clean: Optional boolean
+- glue: Optional boolean
+- tol: Optional tolerance
+
+#examples:
+- #prompt: Combine all solids on stack into one
+  #output:
+  .combine()
+
+#rule:
+Use to get the intersection of the current solid and another solid.
+
+#method:
+.intersect(toIntersect[, clean=True, tol=1e-6])
+
+#allowed_values:
+- toIntersect: Solid to intersect with
+- clean: Optional boolean
+- tol: Optional tolerance
+
+#examples:
+- #prompt: Intersect current solid with cylinder
+  #output:
+  .intersect(cylinder)
+
+#rule:
+Use to create a lofted solid through a sequence of wires or profiles.
+
+#method:
+.loft([ruled=False, combine=True, clean=True])
+
+#allowed_values:
+- ruled: Optional boolean for ruled loft
+- combine: Optional boolean
+- clean: Optional boolean
+
+#examples:
+- #prompt: Create lofted solid through sketches
+  #output:
+  .loft()
+
+#rule:
+Use to sweep profile(s) along a path to create a solid.
+
+#method:
+.sweep(path[, multisection=True, ...])
+
+#allowed_values:
+- path: Path to sweep along
+- multisection: Optional boolean
+
+#examples:
+- #prompt: Sweep profile along path curve
+  #output:
+  .sweep(path)
+
+#rule:
+Use to extrude and twist a wire by a specified angle over extrusion length.
+
+#method:
+.twistExtrude(distance, angleDegrees)
+
+#allowed_values:
+- distance: Extrusion length
+- angleDegrees: Total twist angle over extrusion
+
+#examples:
+- #prompt: Twist extrude sketch 30 units length and 360 degrees
+  #output:
+  .twistExtrude(30, 360)
+
+#rule:
+Use to revolve un-revolved wires around an axis to create a solid.
+
+#method:
+.revolve([angleDegrees=360, axisStart=(0,0,0), axisEnd=(0,0,1)])
+
+#allowed_values:
+- angleDegrees: Angle to revolve (default full 360)
+- axisStart: Start point of axis
+- axisEnd: End point of axis
+
+#examples:
+- #prompt: Revolve profile 360 degrees around Z axis
+  #output:
+  .revolve()
+
+- #prompt: Revolve profile 180 degrees around custom axis
+  #output:
+  .revolve(180, (0,0,0), (1,0,0))
+
+#rule:
+Use to hollow out a solid by removing faces to create a shell with specified wall thickness.
+
+#method:
+.shell(thickness[, kind='default'])
+
+#allowed_values:
+- thickness: Wall thickness (positive float)
+- kind: Optional shell kind or mode (e.g., 'default')
+
+#examples:
+- #prompt: Create a shell with thickness 2mm
+  #output:
+  .shell(2)
+
+#rule:
+Use to fillet (round) edges of a solid with specified radius.
+
+#method:
+.fillet(radius)
+
+#allowed_values:
+- radius: Radius of fillet (float)
+
+#examples:
+- #prompt: Fillet edges with radius 3mm
+  #output:
+  .fillet(3)
+
+#rule:
+Use to chamfer (bevel) edges of a solid with specified length(s).
+
+#method:
+.chamfer(length[, length2=None])
+
+#allowed_values:
+- length: Length of chamfer (float)
+- length2: Optional second length for asymmetric chamfer
+
+#examples:
+- #prompt: Chamfer edges with length 2mm
+  #output:
+  .chamfer(2)
+
+- #prompt: Chamfer edges with lengths 2mm and 3mm
+  #output:
+  .chamfer(2, 3)
+
+#rule:
+Use to split a solid on the stack into parts.
+
+#method:
+.split()
+
+#examples:
+- #prompt: Split the solid into parts
+  #output:
+  .split()
+
+#rule:
+Use to rotate all items on the stack by a specified angle around an axis.
+
+#method:
+.rotate(axisStartPoint, axisDirection, angleDegrees)
+
+#allowed_values:
+- axisStartPoint: Vector or tuple representing start point of axis
+- axisDirection: Vector or tuple representing axis direction
+- angleDegrees: Angle in degrees (float)
+
+#examples:
+- #prompt: Rotate 45 degrees around Z axis at origin
+  #output:
+  .rotate((0,0,0), (0,0,1), 45)
+
+#rule:
+Use to rotate all items on the stack by a specified angle about the specified axis going through the center.
+
+#method:
+.rotateAboutCenter(axisEndPoint, angleDegrees)
+
+#allowed_values:
+- axisEndPoint: Vector or tuple representing axis direction
+- angleDegrees: Angle in degrees (float)
+
+#examples:
+- #prompt: Rotate 90 degrees about X axis through center
+  #output:
+  .rotateAboutCenter((1,0,0), 90)
+
+#rule:
+Use to translate (move) all items on the stack by the specified vector.
+
+#method:
+.translate(vec)
+
+#allowed_values:
+- vec: Vector or tuple representing translation vector (x, y, z)
+
+#examples:
+- #prompt: Translate all items by (5, 0, 0)
+  #output:
+  .translate((5, 0, 0))
+
+#rule:
+Use to mirror a CQ object around a given plane or default plane.
+
+#method:
+.mirror([mirrorPlane=None])
+
+#allowed_values:
+- mirrorPlane: Optional plane (string or object), e.g., "XY", "YZ", or custom plane
+
+#examples:
+- #prompt: Mirror object about YZ plane
+  #output:
+  .mirror("YZ")
+
+- #prompt: Mirror object about default plane
+  #output:
+  .mirror()
+
+=======================================================================================================================================
+
+#section: Import and Export 
+
+#description: For file handling, imports and exports 
+
+#rule:
+Use to get SVG text representation of the first item on the workplane stack.
+
+#method:
+.toSvg([opts=None])
+
+#allowed_values:
+- opts: Optional dictionary of SVG export options (e.g., scale, color)
+
+#examples:
+- #prompt: Get SVG text of the current sketch
+  #output:
+  .toSvg()
+
+#rule:
+Use to export the first item on the stack as an SVG file.
+
+#method:
+.exportSvg(fileName)
+
+#allowed_values:
+- fileName: String path and name of the SVG file to export
+
+#examples:
+- #prompt: Export current sketch as "output.svg"
+  #output:
+  .exportSvg("output.svg")
+
+#rule:
+Use to import a STEP file as a CadQuery Workplane object.
+
+#method:
+importers.importStep(fileName)
+
+#allowed_values:
+- fileName: String path to the STEP file
+
+#examples:
+- #prompt: Import STEP file "part.step"
+  #output:
+  importers.importStep("part.step")
+
+#rule:
+Use to import a DXF file into a CadQuery Workplane.
+
+#method:
+importers.importDXF(fileName[, tol=1e-5, ...])
+
+#allowed_values:
+- fileName: String path to the DXF file
+- tol: Optional tolerance for import
+
+#examples:
+- #prompt: Import DXF file "sketch.dxf"
+  #output:
+  importers.importDXF("sketch.dxf")
+
+#rule:
+Use to export a CadQuery Workplane or Shape to a file.
+
+#method:
+exporters.export(w, fname[, exportType='STEP', ...])
+
+#allowed_values:
+- w: Workplane or Shape object
+- fname: Filename to export to
+- exportType: Optional export format string (e.g., 'STEP', 'STL', 'DXF')
+
+#examples:
+- #prompt: Export workplane to "part.stp" as STEP file
+  #output:
+  exporters.export(w, "part.stp", exportType='STEP')
+
+#rule:
+Use to create a DXF document from CadQuery objects for advanced DXF export.
+
+#method:
+occ_impl.exporters.dxf.DxfDocument([...])
+
+#allowed_values:
+- List of CadQuery objects to add to DXF document
+
+#examples:
+- #prompt: Create a DXF document from multiple shapes
+  #output:
+  dxfDoc = occ_impl.exporters.dxf.DxfDocument([shape1, shape2])
+
+
+#section: Selector string modifiers
+
+#description: special selectors and modifiers used in CadQuery to filter and select faces, edges, or vertices based on their geometric orientation or properties relative to coordinate directions. These selectors allow targeting specific parts of a 3D model efficiently by specifying directions such as parallel, perpendicular, positive/negative axes, or extremal positions (max/min). They also include selectors based on the type of curve or surface.
+
+#rule:
+Use to select faces or edges parallel to a given direction.
+
+#method:
+.faces("Parallel to direction") or using ParallelDirSelector
+
+#allowed_values:
+- ParallelDirSelector: Selector that filters parallel direction faces or edges
+
+#examples:
+- #prompt: Select faces parallel to the X axis
+  #output:
+  .faces("|X")
+
+#rule:
+Use to select faces or edges perpendicular to a given direction.
+
+#method:
+.faces("Perpendicular to direction") or using PerpendicularDirSelector
+
+#allowed_values:
+- PerpendicularDirSelector: Selector that filters perpendicular direction faces or edges
+
+#examples:
+- #prompt: Select faces perpendicular to the Y axis
+  #output:
+  .faces("#Y")
+
+#rule:
+Use to select faces or edges in positive or negative direction along an axis.
+
+#method:
+.faces("+X"), .faces("-Z"), or using DirectionSelector with +/- sign
+
+#allowed_values:
+- + : Positive direction
+- - : Negative direction
+
+#examples:
+- #prompt: Select faces in positive Z direction
+  #output:
+  .faces("+Z")
+
+- #prompt: Select faces in negative X direction
+  #output:
+  .faces("-X")
+
+#rule:
+Use to select faces or edges that are at maximum or minimum extent along a given axis.
+
+#method:
+.faces(">Z") for max, .faces("<X") for min using DirectionMinMaxSelector
+
+#allowed_values:
+- > : Maximum extent
+- < : Minimum extent
+
+#examples:
+- #prompt: Select the top face (max in Z direction)
+  #output:
+  .faces(">Z")
+
+- #prompt: Select the leftmost face (min in X direction)
+  #output:
+  .faces("<X")
+
+#rule:
+Use to select faces or edges by curve or surface type.
+
+#method:
+.faces("%type") using TypeSelector
+
+#allowed_values:
+- % : Specifies curve or surface type selector
+
+#examples:
+- #prompt: Select all faces of a certain curve/surface type
+  #output:
+  .faces("%")
+
+
+#section: Selector Methods 
+
+#description: to select different geometric elements—faces, edges, vertices, solids, and shells—within a CadQuery model. 
+
+#rule:
+Select faces from the current workplane or object matching the given selector.
+
+#method:
+.faces(selector)
+
+#allowed_values:
+- selector: String or callable defining selection criteria (e.g., ">Z", "not |Z")
+
+#examples:
+- #prompt: Select the top face (max Z)
+  #output:
+  .faces(">Z")
+
+#rule:
+Select edges matching the given selector.
+
+#method:
+.edges(selector)
+
+#allowed_values:
+- selector: String or callable to filter edges
+
+#examples:
+- #prompt: Select all edges parallel to X axis
+  #output:
+  .edges("|X")
+
+#rule:
+Select vertices matching the given selector.
+
+#method:
+.vertices(selector)
+
+#allowed_values:
+- selector: String or callable to filter vertices
+
+#examples:
+- #prompt: Select vertices at minimum X
+  #output:
+  .vertices("<X")
+
+#rule:
+Select solids matching the given selector (useful when multiple solids exist).
+
+#method:
+.solids(selector)
+
+#allowed_values:
+- selector: String or callable to filter solids
+
+#examples:
+- #prompt: Select all solids
+  #output:
+  .solids()
+
+#rule:
+Select shells matching the given selector.
+
+#method:
+.shells(selector)
+
+#allowed_values:
+- selector: String or callable to filter shells
+
+#examples:
+- #prompt: Select shells with certain property
+  #output:
+  .shells()
+
+
+
+

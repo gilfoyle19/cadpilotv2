@@ -1,0 +1,362 @@
+#Few-shot examples for prompt abstraction for expert level prompts.
+
+- '#': '1'
+  Name of Part: Rectangular base plate with a circular cutout
+
+  Code: |
+        import cadquery as cq
+        # Generating a workplane for sketch 0
+        wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(-0.75, -0.6796875, 0.0), cq.Vector(1.0, 0.0, 0.0), cq.Vector(0.0, 0.0, 1.0)))
+        loop0=wp_sketch0.moveTo(1.5, 0.0).lineTo(1.5, 1.3578947368421053).lineTo(0.0, 1.3578947368421053).lineTo(0.0, 0.0).close()
+        loop1=wp_sketch0.moveTo(0.7578947368421053, 0.6789473684210526).circle(0.4263157894736842)
+        solid0=wp_sketch0.add(loop0).add(loop1).extrude(-0.1328125)
+        solid=solid0
+
+  Simple Prompt: >
+    Create a rectangular base plate with a large round hole near its center, 
+    and extrude it downward to form a solid.
+
+  Intermediate Prompt: >
+    1. Create a rectangular base measuring 1.5 units in length and 1.3579 units in width.  
+    2. On this base, add a circular cutout with radius approximately 0.4263 units, positioned near the center (at about 0.758, 0.679).  
+    3. Extrude both the base and the circular cutout downward by 0.1328 units to create a solid with a hole.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (-0.75, -0.6796875, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (1.5, 0.0), draw a line to point (1.5, 1.3578947368421053), draw a line to point (0.0, 1.3578947368421053), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.7578947368421053, 0.6789473684210526) and draw a circle with radius 0.4263157894736842.  
+    For sketch 0, extrude the shapes (loop0, loop1) by -0.1328125 units along the normal direction to create a new solid.
+
+- '#': '2'
+  Name of Part: Symmetrical complex base with arcs and circular cutout
+  Code: |
+        import cadquery as cq
+        # Generating a workplane for sketch 0
+        wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(-0.171875, 0.0, 0.0), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop0=wp_sketch0.moveTo(0.05526315789473685, 0.0).threePointArc((0.16973684210526316, 0.11447368421052632), (0.28421052631578947, 0.0)).lineTo(0.3394736842105263, 0.0).lineTo(0.3394736842105263, 0.05526315789473685).lineTo(0.3315789473684211, 0.05526315789473685).lineTo(0.2368421052631579, 0.6947368421052632).threePointArc((0.16973684210526316, 0.7526222401909128), (0.10263157894736842, 0.6947368421052632)).lineTo(0.007894736842105263, 0.05526315789473685).lineTo(0.0, 0.05526315789473685).lineTo(0.0, 0.0).close()
+        loop1=wp_sketch0.moveTo(0.1736842105263158, 0.6789473684210526).circle(0.04736842105263158)
+        solid0=wp_sketch0.add(loop0).add(loop1).extrude(0.0390625, both=True)
+        solid=solid0
+        # Generating a workplane for sketch 1
+        wp_sketch1 = cq.Workplane(cq.Plane(cq.Vector(-0.171875, 0.0, -0.0546875), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop2=wp_sketch1.moveTo(0.010855263157894736, 0.0).threePointArc((0.171875, -0.11340289345178918), (0.33289473684210524, 0.0)).lineTo(0.34375, 0.0).lineTo(0.34375, 0.05789473684210526).lineTo(0.2858552631578947, 0.05789473684210526).threePointArc((0.171875, -0.056085526315789475), (0.05789473684210526, 0.05789473684210526)).lineTo(0.0, 0.05789473684210526).lineTo(0.0, 0.0).close()
+        solid1=wp_sketch1.add(loop2).extrude(0.0390625, both=True)
+        solid=solid.union(solid1)
+        solid=solid0
+
+  Simple Prompt: >
+    Create a symmetrical base with curved edges formed by arcs, a small circular hole near the top,
+    and a second similar shape extruded and joined below.
+
+  Intermediate Prompt: >
+    1. Create a base shape using lines and smooth three-point arcs forming a complex closed profile approximately 0.34 units wide and 0.7 units tall.  
+    2. Include a small circular cutout with radius about 0.0474 units near the top center of this base.  
+    3. Extrude this combined shape symmetrically by 0.0391 units along the normal direction to form a solid.  
+    4. Create a second similar closed shape on a workplane shifted -0.0547 units along the normal, using arcs and lines, about 0.34 units wide and 0.058 units tall.  
+    5. Extrude this second shape symmetrically by 0.0391 units and union it with the first solid.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (-0.171875, 0.0, 0.0), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.05526315789473685, 0.0), draw a three-point arc through midpoint (0.16973684210526316, 0.11447368421052632) to endpoint (0.28421052631578947, 0.0), draw a line to point (0.3394736842105263, 0.0), draw a line to point (0.3394736842105263, 0.05526315789473685), draw a line to point (0.3315789473684211, 0.05526315789473685), draw a line to point (0.2368421052631579, 0.6947368421052632), draw a three-point arc through midpoint (0.16973684210526316, 0.7526222401909128) to endpoint (0.10263157894736842, 0.6947368421052632), draw a line to point (0.007894736842105263, 0.05526315789473685), draw a line to point (0.0, 0.05526315789473685), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.1736842105263158, 0.6789473684210526) and draw a circle with radius 0.04736842105263158.  
+    For sketch 0, extrude the shapes (loop0, loop1) symmetrically by 0.0390625 units in both directions along the normal to create a new solid.  
+    For sketch 1, create a workplane with an origin at coordinates (-0.171875, 0.0, -0.0546875), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 2 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.010855263157894736, 0.0), draw a three-point arc through midpoint (0.171875, -0.11340289345178918) to endpoint (0.33289473684210524, 0.0), draw a line to point (0.34375, 0.0), draw a line to point (0.34375, 0.05789473684210526), draw a line to point (0.2858552631578947, 0.05789473684210526), draw a three-point arc through midpoint (0.171875, -0.056085526315789475) to endpoint (0.05789473684210526, 0.05789473684210526), draw a line to point (0.0, 0.05789473684210526), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For sketch 1, extrude the shapes (loop2) symmetrically by 0.0390625 units in both directions along the normal and union the result with the existing solid.
+
+- '#': '3'
+  Name of Part: Rectangular base with two circular cutouts and stacked circular extrusions
+
+  Code: |
+
+        import cadquery as cq
+        # Generating a workplane for sketch 0
+        wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(-0.5, 0.0, -0.75), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop0=wp_sketch0.moveTo(0.9947368421052631, 0.0).lineTo(0.9947368421052631, 1.5).lineTo(0.0, 1.5).lineTo(0.0, 0.0).close()
+        loop1=wp_sketch0.moveTo(0.5052631578947369, 0.3315789473684211).circle(0.12631578947368421)
+        loop2=wp_sketch0.moveTo(0.5052631578947369, 1.168421052631579).circle(0.12631578947368421)
+        solid0=wp_sketch0.add(loop0).add(loop1).add(loop2).extrude(0.25)
+        solid=solid0
+        # Generating a workplane for sketch 1
+        wp_sketch1 = cq.Workplane(cq.Plane(cq.Vector(-0.2265625, -0.25, 0.4140625), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop3=wp_sketch1.moveTo(0.23289473684210527, 0.0).circle(0.22804276315789476)
+        loop4=wp_sketch1.moveTo(0.23289473684210527, 0.0).circle(0.13585526315789476)
+        solid1=wp_sketch1.add(loop3).add(loop4).extrude(0.1640625)
+        solid=solid.union(solid1)
+        # Generating a workplane for sketch 2
+        wp_sketch2 = cq.Workplane(cq.Plane(cq.Vector(-0.2265625, -0.25, -0.4140625), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop5=wp_sketch2.moveTo(0.23289473684210527, 0.0).circle(0.22804276315789476)
+        loop6=wp_sketch2.moveTo(0.23289473684210527, 0.0).circle(0.13585526315789476)
+        solid2=wp_sketch2.add(loop5).add(loop6).extrude(0.1640625)
+        solid=solid.union(solid2)
+
+  Simple Prompt: >
+    Build a tall rectangular base plate with two circular holes inside it,
+    then add two sets of concentric circular extrusions stacked above and below the base.
+
+  Intermediate Prompt: >
+    1. Create a rectangular base measuring approximately 0.995 units wide and 1.5 units tall,  
+       positioned at (-0.5, 0.0, -0.75), and extrude it upward by 0.25 units.  
+    2. Cut two circular holes inside the base, each with radius about 0.1263 units,  
+       located at (0.5053, 0.332) and (0.5053, 1.168) respectively.  
+    3. Create two workplanes above and below the base, shifted by approximately +0.414 and -0.414 units along the normal.  
+    4. On each workplane, create two concentric circles with radii ~0.228 and ~0.136 units,  
+       then extrude these shapes by 0.1641 units upward and union them with the base solid.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (-0.5, 0.0, -0.75), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.9947368421052631, 0.0), draw a line to point (0.9947368421052631, 1.5), draw a line to point (0.0, 1.5), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.5052631578947369, 0.3315789473684211) and draw a circle with radius 0.12631578947368421.  
+    For loop 2 in sketch 0, create a closed shape by performing the following operation: move to (0.5052631578947369, 1.168421052631579) and draw a circle with radius 0.12631578947368421.  
+    For sketch 0, extrude the shapes (loop0, loop1, loop2) by 0.25 units along the normal direction to create a new solid.  
+    For sketch 1, create a workplane with an origin at coordinates (-0.2265625, -0.25, 0.4140625), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 3 in sketch 1, create a closed shape by performing the following operation: move to (0.23289473684210527, 0.0) and draw a circle with radius 0.22804276315789476.  
+    For loop 4 in sketch 1, create a closed shape by performing the following operation: move to (0.23289473684210527, 0.0) and draw a circle with radius 0.13585526315789476.  
+    For sketch 1, extrude the shapes (loop3, loop4) by 0.1640625 units along the normal direction and union the result with the existing solid.  
+    For sketch 2, create a workplane with an origin at coordinates (-0.2265625, -0.25, -0.4140625), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 5 in sketch 2, create a closed shape by performing the following operation: move to (0.23289473684210527, 0.0) and draw a circle with radius 0.22804276315789476.  
+    For loop 6 in sketch 2, create a closed shape by performing the following operation: move to (0.23289473684210527, 0.0) and draw a circle with radius 0.13585526315789476.  
+    For sketch 2, extrude the shapes (loop5, loop6) by 0.1640625 units along the normal direction and union the result with the existing solid.
+
+- '#': '4'
+  Name of Part: Base with curved front and large circular cutout
+
+  Code: |
+
+    import cadquery as cq
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(-0.3203125, 0.4140625, 0.0), cq.Vector(1.0, 0.0, 0.0), cq.Vector(0.0, 0.0, 1.0)))
+    loop0=wp_sketch0.moveTo(0.0, 0.0).threePointArc((0.31805098684210525, -0.9245060800363039), (0.6361019736842105, 0.0)).lineTo(0.6361019736842105, 0.3033717105263158).lineTo(0.5480263157894736, 0.3033717105263158).lineTo(0.5480263157894736, 0.342516447368421).lineTo(0.08807565789473684, 0.342516447368421).lineTo(0.08807565789473684, 0.3033717105263158).lineTo(0.0, 0.3033717105263158).lineTo(0.0, 0.0).close()
+    loop1=wp_sketch0.moveTo(0.3131578947368421, -0.41101973684210524).circle(0.2642269736842105)
+    solid0=wp_sketch0.add(loop0).add(loop1).extrude(0.2890625)
+    solid=solid0
+
+  Simple Prompt: >
+    Create a base with a curved front edge formed by an arc, straight sides, and a large circular hole,
+    then extrude it upward to form a solid.
+
+  Intermediate Prompt: >
+    1. Create a base starting at the origin, with a front edge formed by a three-point arc spanning approximately 0.636 units wide and dipping downward.  
+    2. Extend the shape with straight lines forming a rectangle about 0.636 units wide and 0.3425 units tall.  
+    3. Add a large circular cutout of radius about 0.2642 units centered near the front bottom region (0.3132, -0.411).  
+    4. Extrude the combined shape by 0.2891 units upward along the normal vector.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (-0.3203125, 0.4140625, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.31805098684210525, -0.9245060800363039) to endpoint (0.6361019736842105, 0.0), draw a line to point (0.6361019736842105, 0.3033717105263158), draw a line to point (0.5480263157894736, 0.3033717105263158), draw a line to point (0.5480263157894736, 0.342516447368421), draw a line to point (0.08807565789473684, 0.342516447368421), draw a line to point (0.08807565789473684, 0.3033717105263158), draw a line to point (0.0, 0.3033717105263158), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.3131578947368421, -0.41101973684210524) and draw a circle with radius 0.2642269736842105.  
+    For sketch 0, extrude the shapes (loop0, loop1) by 0.2890625 units along the normal direction to create a new solid.
+
+- '#': '5'
+  Name of Part: Rounded rectangular base with circular cutout
+
+  Code: |
+    import cadquery as cq
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(-0.75, 0.0, -0.75), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+    loop0=wp_sketch0.moveTo(1.5, 0.0).lineTo(1.5, 0.7578947368421053).threePointArc((1.3857387784309039, 1.0179562539233231), (1.1210526315789473, 1.1210526315789473)).lineTo(0.37894736842105264, 1.1210526315789473).threePointArc((0.11426122156909607, 1.0179562539233231), (0.0, 0.7578947368421053)).lineTo(0.0, 0.0).close()
+    loop1=wp_sketch0.moveTo(0.7578947368421053, 0.7578947368421053).circle(0.2210526315789474)
+    solid0=wp_sketch0.add(loop0).add(loop1).extrude(0.1875)
+    solid=solid0
+
+  Simple Prompt: >
+    Create a rectangular base with rounded edges on top formed by arcs,
+    and a circular hole near the top center, then extrude the whole shape.
+
+  Intermediate Prompt: >
+    1. Create a rectangular base 1.5 units wide and about 1.12 units tall,  
+       with the top corners rounded using two three-point arcs, starting at (-0.75, 0, -0.75).  
+    2. Add a circular hole of radius approximately 0.221 units at coordinates (0.758, 0.758).  
+    3. Extrude the combined shape upward by 0.1875 units along the normal vector.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (-0.75, 0.0, -0.75), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (1.5, 0.0), draw a line to point (1.5, 0.7578947368421053), draw a three-point arc through midpoint (1.3857387784309039, 1.0179562539233231) to endpoint (1.1210526315789473, 1.1210526315789473), draw a line to point (0.37894736842105264, 1.1210526315789473), draw a three-point arc through midpoint (0.11426122156909607, 1.0179562539233231) to endpoint (0.0, 0.7578947368421053), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.7578947368421053, 0.7578947368421053) and draw a circle with radius 0.2210526315789474.  
+    For sketch 0, extrude the shapes (loop0, loop1) by 0.1875 units along the normal direction to create a new solid.
+
+- '#': '6'
+  Name of Part: Concentric rings base with complex upper extrusion
+
+  Code: |
+
+        import cadquery as cq
+        # Generating a workplane for sketch 0
+        wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(-0.2578125, 0.0, 0.0), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop0=wp_sketch0.moveTo(0.2565789473684211, 0.0).circle(0.2565789473684211)
+        loop1=wp_sketch0.moveTo(0.2565789473684211, 0.0).circle(0.1924342105263158)
+        solid0=wp_sketch0.add(loop0).add(loop1).extrude(0.2890625)
+        solid=solid0
+        # Generating a workplane for sketch 1
+        wp_sketch1 = cq.Workplane(cq.Plane(cq.Vector(-0.2734375, -0.2890625, -0.15625), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop2=wp_sketch1.moveTo(0.2723684210526316, -0.15320723684210527).lineTo(0.5390625, 0.0).lineTo(0.5390625, 0.3120888157894737).lineTo(0.2723684210526316, 0.46529605263157897).lineTo(0.0, 0.3120888157894737).lineTo(0.0, 0.0).close()
+        loop3=wp_sketch1.moveTo(0.14185855263157895, -0.06241776315789474).lineTo(0.2723684210526316, -0.1361842105263158).lineTo(0.3972039473684211, -0.06241776315789474).lineTo(0.5220394736842106, 0.011348684210526316).lineTo(0.5220394736842106, 0.15320723684210527).lineTo(0.5220394736842106, 0.3007401315789474).lineTo(0.3972039473684211, 0.37450657894736844).lineTo(0.2723684210526316, 0.44827302631578947).lineTo(0.14185855263157895, 0.37450657894736844).lineTo(0.017023026315789475, 0.3007401315789474).lineTo(0.017023026315789475, 0.15320723684210527).lineTo(0.017023026315789475, 0.011348684210526316).close()
+        solid1=wp_sketch1.add(loop2).add(loop3).extrude(0.171875)
+        solid=solid.union(solid1)
+
+  Simple Prompt: >
+    Create two concentric circular rings as a base, then add a complex shaped extrusion on top with two connected polygonal loops.
+
+  Intermediate Prompt: >
+    1. Create two concentric circles centered at (0.0,0.0) with radii about 0.257 and 0.1926 units,  
+       extrude these rings upwards by 0.2891 units.  
+    2. On a workplane offset slightly downward and backward, create two polygonal shapes:  
+       - A hexagonal loop roughly 0.54 units wide and 0.46 units tall,  
+       - A second larger loop surrounding it with detailed edges,  
+       then extrude both by 0.1719 units and union the result with the base.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (-0.2578125, 0.0, 0.0), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operation: move to (0.2565789473684211, 0.0) and draw a circle with radius 0.2565789473684211.  
+    For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.2565789473684211, 0.0) and draw a circle with radius 0.1924342105263158.  
+    For sketch 0, extrude the shapes (loop0, loop1) by 0.2890625 units along the normal direction to create a new solid.  
+    For sketch 1, create a workplane with an origin at coordinates (-0.2734375, -0.2890625, -0.15625), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 2 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.2723684210526316, -0.15320723684210527), draw a line to point (0.5390625, 0.0), draw a line to point (0.5390625, 0.3120888157894737), draw a line to point (0.2723684210526316, 0.46529605263157897), draw a line to point (0.0, 0.3120888157894737), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For loop 3 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.14185855263157895, -0.06241776315789474), draw a line to point (0.2723684210526316, -0.1361842105263158), draw a line to point (0.3972039473684211, -0.06241776315789474), draw a line to point (0.5220394736842106, 0.011348684210526316), draw a line to point (0.5220394736842106, 0.15320723684210527), draw a line to point (0.5220394736842106, 0.3007401315789474), draw a line to point (0.3972039473684211, 0.37450657894736844), draw a line to point (0.2723684210526316, 0.44827302631578947), draw a line to point (0.14185855263157895, 0.37450657894736844), draw a line to point (0.017023026315789475, 0.3007401315789474), draw a line to point (0.017023026315789475, 0.15320723684210527), and draw a line to point (0.017023026315789475, 0.011348684210526316), and then close the loop.  
+    For sketch 1, extrude the shapes (loop2, loop3) by 0.171875 units along the normal direction and union the result with the existing solid.
+
+- '#': '7'
+  Name of Part: Stepped rectangular block with side extrusion
+
+  Code: |
+
+        import cadquery as cq
+        # Generating a workplane for sketch 0
+        wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(0.0, 0.0, 0.0), cq.Vector(1.0, 0.0, 0.0), cq.Vector(0.0, 0.0, 1.0)))
+        loop0=wp_sketch0.moveTo(0.75, 0.0).lineTo(0.75, 0.6473684210526316).lineTo(0.0, 0.6473684210526316).lineTo(0.0, 0.0).close()
+        solid0=wp_sketch0.add(loop0).extrude(0.1328125)
+        solid=solid0
+        # Generating a workplane for sketch 1
+        wp_sketch1 = cq.Workplane(cq.Plane(cq.Vector(0.0, 0.53125, 0.1328125), cq.Vector(1.0, 0.0, 0.0), cq.Vector(0.0, 0.0, 1.0)))
+        loop1=wp_sketch1.moveTo(0.75, 0.0).lineTo(0.75, 0.11842105263157895).lineTo(0.0, 0.11842105263157895).lineTo(0.0, 0.0).close()
+        solid1=wp_sketch1.add(loop1).extrude(0.3203125)
+        solid=solid.union(solid1)
+        # Generating a workplane for sketch 2
+        wp_sketch2 = cq.Workplane(cq.Plane(cq.Vector(0.75, 0.0, 0.1328125), cq.Vector(3.749399456654644e-33, 1.0, -6.123233995736766e-17), cq.Vector(1.0, 0.0, 6.123233995736766e-17)))
+        loop2=wp_sketch2.moveTo(0.53125, 0.0).lineTo(0.53125, 0.3243421052631579).lineTo(0.0, 0.0).close()
+        solid2=wp_sketch2.add(loop2).extrude(-0.046875)
+        solid=solid.union(solid2)
+
+  Simple Prompt: >
+    Create a stepped rectangular block with a smaller block on top and an extrusion on the side.
+
+  Intermediate Prompt: >
+    1. Create a rectangular base 0.75 x 0.6474 units, extruded up by 0.1328 units.  
+    2. On top of this base at height 0.1328, extrude another smaller rectangle 0.75 x 0.1184 units by 0.3203 units.  
+    3. At the side, create a right-angled triangular shape on a vertical plane at x=0.75, extrude it inward by 0.0469 units, and union it with the existing solid.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (0.0, 0.0, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.75, 0.0), draw a line to point (0.75, 0.6473684210526316), draw a line to point (0.0, 0.6473684210526316), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For sketch 0, extrude the shapes (loop0) by 0.1328125 units along the normal direction to create a new solid.  
+    For sketch 1, create a workplane with an origin at coordinates (0.0, 0.53125, 0.1328125), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0).  
+    For loop 1 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.75, 0.0), draw a line to point (0.75, 0.11842105263157895), draw a line to point (0.0, 0.11842105263157895), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For sketch 1, extrude the shapes (loop1) by 0.3203125 units along the normal direction and union the result with the existing solid.  
+    For sketch 2, create a workplane with an origin at coordinates (0.75, 0.0, 0.1328125), an x-axis direction vector of (3.749399456654644e-33, 1.0, -6.123233995736766e-17), and a normal vector of (1.0, 0.0, 6.123233995736766e-17).  
+    For loop 2 in sketch 2, create a closed shape by performing the following operations in sequence: move to point (0.53125, 0.0), draw a line to point (0.53125, 0.3243421052631579), and draw a line to point (0.0, 0.0), and then close the loop.  
+    For sketch 2, extrude the shapes (loop2) by -0.046875 units along the normal direction and union the result with the existing solid.
+
+- '#': '8'
+  Name of Part: Complex plate with multiple holes and extruded features
+
+  Code: |
+
+        import cadquery as cq
+        # Generating a workplane for sketch 0
+        wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(0.0, -0.40625, -0.234375), cq.Vector(3.749399456654644e-33, 1.0, -6.123233995736766e-17), cq.Vector(1.0, 0.0, 6.123233995736766e-17)))
+        loop0=wp_sketch0.moveTo(0.0, 0.0).threePointArc((0.034732896507319, -0.08385262980847048), (0.11858552631578947, -0.11858552631578947)).lineTo(0.6861019736842106, -0.11858552631578947).threePointArc((0.7699546034926811, -0.08385262980847048), (0.8046875, 0.0)).lineTo(0.8046875, 0.4574013157894737).threePointArc((0.7699546034926811, 0.5412539455979442), (0.6861019736842106, 0.5759868421052632)).lineTo(0.11858552631578947, 0.5759868421052632).threePointArc((0.034732896507319, 0.5412539455979442), (0.0, 0.4574013157894737)).lineTo(0.0, 0.0).close()
+        loop1=wp_sketch0.moveTo(0.11858552631578947, 0.0).circle(0.05929276315789474)
+        loop2=wp_sketch0.moveTo(0.11858552631578947, 0.4574013157894737).circle(0.05929276315789474)
+        loop3=wp_sketch0.moveTo(0.6861019736842106, 0.0).circle(0.05929276315789474)
+        loop4=wp_sketch0.moveTo(0.6861019736842106, 0.4574013157894737).circle(0.05929276315789474)
+        solid0=wp_sketch0.add(loop0).add(loop1).add(loop2).add(loop3).add(loop4).extrude(0.171875)
+        solid=solid0
+        # Generating a workplane for sketch 1
+        wp_sketch1 = cq.Workplane(cq.Plane(cq.Vector(0.0, 0.0, 0.34375), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop5=wp_sketch1.moveTo(0.17565789473684212, 0.0).lineTo(0.17565789473684212, -0.6953125).lineTo(0.6953125, -0.09514802631578947).threePointArc((0.34163506496182444, -0.09342948535607334), (0.3952302631578947, 0.25616776315789475)).lineTo(0.0, 0.0).close()
+        solid1=wp_sketch1.add(loop5).extrude(0.0546875, both=True)
+        solid=solid.union(solid1)
+        # Generating a workplane for sketch 2
+        wp_sketch2 = cq.Workplane(cq.Plane(cq.Vector(0.2890625, 0.0, 0.40625), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop6=wp_sketch2.moveTo(0.23289473684210527, 0.0).circle(0.22804276315789476)
+        loop7=wp_sketch2.moveTo(0.23289473684210527, 0.0).circle(0.11644736842105263)
+        solid2=wp_sketch2.add(loop6).add(loop7).extrude(0.0859375, both=True)
+        solid=solid.union(solid2)
+
+  Simple Prompt: >
+    Create a complex plate with a rounded rectangular base, four holes arranged in a pattern,
+    and two extruded features on top with circular profiles.
+
+  Intermediate Prompt: >
+    1. Create a rounded rectangular base with arcs and straight edges, approximately 0.8 x 0.58 units,  
+       extruded by 0.1719 units upward.  
+    2. Cut four circular holes of radius ~0.0593 units at specific positions on the base.  
+    3. On top at z=0.34375, extrude a closed shape with straight and arc edges, symmetrically by 0.0547 units.  
+    4. At another location on top (origin shifted by 0.2891 in x), extrude two concentric circular shapes symmetrically by 0.0859 units.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (0.0, -0.40625, -0.234375), an x-axis direction vector of (3.749399456654644e-33, 1.0, -6.123233995736766e-17), and a normal vector of (1.0, 0.0, 6.123233995736766e-17).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.034732896507319, -0.08385262980847048) to endpoint (0.11858552631578947, -0.11858552631578947), draw a line to point (0.6861019736842106, -0.11858552631578947), draw a three-point arc through midpoint (0.7699546034926811, -0.08385262980847048) to endpoint (0.8046875, 0.0), draw a line to point (0.8046875, 0.4574013157894737), draw a three-point arc through midpoint (0.7699546034926811, 0.5412539455979442) to endpoint (0.6861019736842106, 0.5759868421052632), draw a line to point (0.11858552631578947, 0.5759868421052632), draw a three-point arc through midpoint (0.034732896507319, 0.5412539455979442) to endpoint (0.0, 0.4574013157894737), and draw a line to point (0.0, 0.0), then close the loop.  
+    For loop 1 in sketch 0, create a closed shape by moving to (0.11858552631578947, 0.0) and drawing a circle with radius 0.05929276315789474.  
+    For loop 2 in sketch 0, create a closed shape by moving to (0.11858552631578947, 0.4574013157894737) and drawing a circle with radius 0.05929276315789474.  
+    For loop 3 in sketch 0, create a closed shape by moving to (0.6861019736842106, 0.0) and drawing a circle with radius 0.05929276315789474.  
+    For loop 4 in sketch 0, create a closed shape by moving to (0.6861019736842106, 0.4574013157894737) and drawing a circle with radius 0.05929276315789474.  
+    For sketch 0, extrude the shapes (loop0, loop1, loop2, loop3, loop4) by 0.171875 units along the normal direction to create a new solid.  
+    For sketch 1, create a workplane with an origin at coordinates (0.0, 0.0, 0.34375), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 5 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.17565789473684212, 0.0), draw a line to point (0.17565789473684212, -0.6953125), draw a line to point (0.6953125, -0.09514802631578947), draw a three-point arc through midpoint (0.34163506496182444, -0.09342948535607334) to endpoint (0.3952302631578947, 0.25616776315789475), and draw a line to point (0.0, 0.0), then close the loop.  
+    For sketch 1, extrude the shapes (loop5) symmetrically by 0.0546875 units in both directions along the normal and union the result with the existing solid.  
+    For sketch 2, create a workplane with an origin at coordinates (0.2890625, 0.0, 0.40625), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 6 in sketch 2, create a closed shape by moving to (0.23289473684210527, 0.0) and drawing a circle with radius 0.22804276315789476.  
+    For loop 7 in sketch 2, create a closed shape by moving to (0.23289473684210527, 0.0) and drawing a circle with radius 0.11644736842105263.  
+    For sketch 2, extrude the shapes (loop6, loop7) symmetrically by 0.0859375 units in both directions along the normal and union the result with the existing solid.
+
+- '#': '9'
+  Name of Part: Complex plate with multiple holes and extruded features
+
+  Code: | 
+        import cadquery as cq
+        # Generating a workplane for sketch 0
+        wp_sketch0 = cq.Workplane(cq.Plane(cq.Vector(0.0, 0.0, 0.1015625), cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17), cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17)))
+        loop0=wp_sketch0.moveTo(0.0, 0.0).threePointArc((0.02998783366963391, -0.07239703475141873), (0.10238486842105264, -0.10238486842105264)).lineTo(0.39588815789473686, -0.10238486842105264).threePointArc((0.4682851926461556, -0.07239703475141873), (0.4982730263157895, 0.0)).lineTo(0.4982730263157895, 0.0477796052631579).threePointArc((0.4682851926461556, 0.12017664001457663), (0.39588815789473686, 0.15016447368421054)).lineTo(0.3003289473684211, 0.15016447368421054).threePointArc((0.26654366448442557, 0.16415879606337294), (0.2525493421052632, 0.19794407894736843)).lineTo(0.2525493421052632, 0.5460526315789473).threePointArc((0.22256150843562927, 0.6184496663303661), (0.15016447368421054, 0.6484375)).lineTo(0.10238486842105264, 0.6484375).threePointArc((0.02998783366963391, 0.6184496663303661), (0.0, 0.5460526315789473)).lineTo(0.0, 0.0).close()
+        loop1=wp_sketch0.moveTo(0.12286184210526316, 0.02730263157894737).circle(0.02730263157894737)
+        loop2=wp_sketch0.moveTo(0.12286184210526316, 0.2730263157894737).circle(0.02730263157894737)
+        loop3=wp_sketch0.moveTo(0.12286184210526316, 0.5255756578947369).circle(0.02730263157894737)
+        loop4=wp_sketch0.moveTo(0.3754111842105263, 0.02730263157894737).circle(0.02730263157894737)
+        solid0=wp_sketch0.add(loop0).add(loop1).add(loop2).add(loop3).add(loop4).extrude(0.03125)
+        solid=solid0
+
+  Simple Prompt: >
+    Create a complex plate with a rounded rectangular base, four holes arranged in a pattern,
+    and two extruded features on top with circular profiles.
+
+  Intermediate Prompt: >
+    1. Create a rounded rectangular base with arcs and straight edges, approximately 0.8 x 0.58 units,  
+       extruded by 0.1719 units upward.  
+    2. Cut four circular holes of radius ~0.0593 units at specific positions on the base.  
+    3. On top at z=0.34375, extrude a closed shape with straight and arc edges, symmetrically by 0.0547 units.  
+    4. At another location on top (origin shifted by 0.2891 in x), extrude two concentric circular shapes symmetrically by 0.0859 units.
+
+  Expert Prompt: >
+    Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions.  
+    For sketch 0, create a workplane with an origin at coordinates (0.0, -0.40625, -0.234375), an x-axis direction vector of (3.749399456654644e-33, 1.0, -6.123233995736766e-17), and a normal vector of (1.0, 0.0, 6.123233995736766e-17).  
+    For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.034732896507319, -0.08385262980847048) to endpoint (0.11858552631578947, -0.11858552631578947), draw a line to point (0.6861019736842106, -0.11858552631578947), draw a three-point arc through midpoint (0.7699546034926811, -0.08385262980847048) to endpoint (0.8046875, 0.0), draw a line to point (0.8046875, 0.4574013157894737), draw a three-point arc through midpoint (0.7699546034926811, 0.5412539455979442) to endpoint (0.6861019736842106, 0.5759868421052632), draw a line to point (0.11858552631578947, 0.5759868421052632), draw a three-point arc through midpoint (0.034732896507319, 0.5412539455979442) to endpoint (0.0, 0.4574013157894737), and draw a line to point (0.0, 0.0), then close the loop.  
+    For loop 1 in sketch 0, create a closed shape by moving to (0.11858552631578947, 0.0) and drawing a circle with radius 0.05929276315789474.  
+    For loop 2 in sketch 0, create a closed shape by moving to (0.11858552631578947, 0.4574013157894737) and drawing a circle with radius 0.05929276315789474.  
+    For loop 3 in sketch 0, create a closed shape by moving to (0.6861019736842106, 0.0) and drawing a circle with radius 0.05929276315789474.  
+    For loop 4 in sketch 0, create a closed shape by moving to (0.6861019736842106, 0.4574013157894737) and drawing a circle with radius 0.05929276315789474.  
+    For sketch 0, extrude the shapes (loop0, loop1, loop2, loop3, loop4) by 0.171875 units along the normal direction to create a new solid.  
+    For sketch 1, create a workplane with an origin at coordinates (0.0, 0.0, 0.34375), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 5 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.17565789473684212, 0.0), draw a line to point (0.17565789473684212, -0.6953125), draw a line to point (0.6953125, -0.09514802631578947), draw a three-point arc through midpoint (0.34163506496182444, -0.09342948535607334) to endpoint (0.3952302631578947, 0.25616776315789475), and draw a line to point (0.0, 0.0), then close the loop.  
+    For sketch 1, extrude the shapes (loop5) symmetrically by 0.0546875 units in both directions along the normal and union the result with the existing solid.  
+    For sketch 2, create a workplane with an origin at coordinates (0.2890625, 0.0, 0.40625), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17).  
+    For loop 6 in sketch 2, create a closed shape by moving to (0.23289473684210527, 0.0) and drawing a circle with radius 0.22804276315789476.  
+    For loop 7 in sketch 2, create a closed shape by moving to (0.23289473684210527, 0.0) and drawing a circle with radius 0.11644736842105263.  
+    For sketch 2, extrude the shapes (loop6, loop7) symmetrically by 0.0859375 units in both directions along the normal and union the result with the existing solid.
