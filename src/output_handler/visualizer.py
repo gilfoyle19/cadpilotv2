@@ -1,4 +1,4 @@
-import pyvista as pv
+#import pyvista as pv
 from pathlib import Path
 from loguru import logger
 from typing import Optional
@@ -18,15 +18,16 @@ class ModelVisualizer:
         Args: cadquery obj, optional screenshot path
         Returns: Path to screenshot if saved, else None
         """
+        import pyvista as pv
         try:
             #Export to a temporary STEP file 
-            with tempfile.NamedTemporaryFile(suffix=".step", delete=False) as f:
-                temp_step = f.name 
+            with tempfile.NamedTemporaryFile(suffix=".stl", delete=False) as f:
+                temp_stl = f.name 
 
-            cadquery_obj.val().exportStep(temp_step)
+            cadquery_obj.val().exportStl(temp_stl)
 
             #Load STEP file into PyVista
-            mesh = pv.read(temp_step)
+            mesh = pv.read(temp_stl)
 
             #create interactive plotter
             self.plotter = pv.Plotter()
@@ -48,12 +49,13 @@ class ModelVisualizer:
             self.plotter.show()
 
             #Clean up the temporary file
-            os.unlink(temp_step)
+            os.unlink(temp_stl)
 
             return screenshot_saved
         
-        except ImportError:
-            logger.error("PyVista is not installed. Please install it with 'pip install pyvista'.")
+        except ImportError as e:
+            #logger.error("PyVista is not installed. Please install it with 'pip install pyvista'.")
+            logger.error(f"Pyvista import error:, {e}")
             return None
         except Exception as e:
             logger.error(f"Failed to visualize model: {e}")
