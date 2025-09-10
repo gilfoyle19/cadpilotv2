@@ -4,7 +4,7 @@ class OpenRouterModel(StrEnum):
     """Enum of supported OpenRouter models with focus on free options."""
     
     # BEST FREE DEFAULT: Google's Gemini Pro - reliable and capable
-    GOOGLE_GEMINI_FLASH = "google/gemini-2.0-flash-exp:free"
+    GOOGLE_GEMINI_FLASH = "google/gemini-2.5-flash-image-preview:free"
     
     # Excellent free alternatives:
     OPENAI_GPT_OSS = "openai/gpt-oss-20b:free"

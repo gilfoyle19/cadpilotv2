@@ -1,4 +1,4 @@
-#import pyvista as pv
+import pyvista as pv
 from pathlib import Path
 from loguru import logger
 from typing import Optional
@@ -18,7 +18,7 @@ class ModelVisualizer:
         Args: cadquery obj, optional screenshot path
         Returns: Path to screenshot if saved, else None
         """
-        import pyvista as pv
+        #import pyvista as pv
         try:
             #Export to a temporary STEP file 
             with tempfile.NamedTemporaryFile(suffix=".stl", delete=False) as f:

@@ -28,7 +28,10 @@ class SpecWorker(BaseWorker):
         structured_spec = self._parse_json_response(llm_response)
         
         logger.success(f"Generated spec: {structured_spec.get('part_name', 'unknown')} "
-                      f"with {len(structured_spec.get('parameters', {}))} parameters")
+                      )
+        
+        #logger.success(f"Generated spec: {structured_spec.get('part_name', 'unknown')} "
+                     # f"with {len(structured_spec.get('parameters', {}))} parameters")
         
         return structured_spec
     

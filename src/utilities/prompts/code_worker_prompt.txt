@@ -47,11 +47,11 @@ Output:
 
 import cadquery as cq
 
-# Parameters
-side_length = 30
+# parameters
+length = 4
+height = 3
+thickness = 0.5
+fillet_radius = 0.5
 
-# Create cube
-result = (
-    cq.Workplane("XY")
-    .box(side_length, side_length, side_length)
-)
+# functions
+result = cq.Workplane("XY").box(length, height, thickness).edges("|Z").fillet(fillet_radius)
