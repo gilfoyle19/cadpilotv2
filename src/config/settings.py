@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     )
 
     default_model: str = Field(
-        OpenRouterModel.GOOGLE_GEMINI_FLASH,  # Default to Google Gemini Pro
+        OpenRouterModel.OPENAI_GPT_OSS,  # Default to Google Gemini Pro
         validation_alias="DEFAULT_MODEL"
     )
 
