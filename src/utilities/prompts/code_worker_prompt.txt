@@ -55,3 +55,1379 @@ fillet_radius = 0.5
 
 # functions
 result = cq.Workplane("XY").box(length, height, thickness).edges("|Z").fillet(fillet_radius)
+
+#1:
+Input:
+{
+  "part_name": "Simple Rectangular Plate",
+  "description": "A rectangular plate with length of 4 mm, height of 3 mm and a thickness of 0.5 mm. The edges of the plate are filleted with a fillet radius of 0.5 mm.",
+  "cad_operations": [
+    {
+      "type": "base_solid",
+      "shape": "box",
+      "parameters": {
+        "length": 4,
+        "height": 3,
+        "thickness": 0.5,
+        "plane": "XY"
+      }
+    },
+    {
+      "type": "modifier",
+      "operation": "fillet",
+      "parameters": {
+        "selector": "edges(\"|Z\")",
+        "radius": 0.5
+      }
+    }
+  ]
+}
+Output:
+import cadquery as cq\n\n# parameters\nlength =4\nheight = 3\nthickness =
+      0.5\nfillet_radius = 0.5\n\n# functions\nresult = cq.Workplane("XY" ).box(length,
+      height, thickness).edges("|Z").fillet(fillet_radius)
+
+#2:
+Input:
+{
+  "part_name": "A prismatic solid with a three-point arc and line segments",
+  "description": "A prismatic solid created in the front plane from a closed sketch. The sketch uses line segments and a three-point arc to define the profile, which is then extruded to a height of 0.25.",
+  "cad_operations": [
+    {
+      "type": "sketch",
+      "plane": "front",
+      "operations": [
+        {
+          "type": "line_to",
+          "parameters": {
+            "points": [
+              [2.0, 0],
+              [2.0, 1.0]
+            ]
+          }
+        },
+        {
+          "type": "three_point_arc",
+          "parameters": {
+            "end_point": [0.0, 1.0],
+            "control_point": [1.0, 1.5]
+          }
+        },
+        {
+          "type": "close_path"
+        }
+      ]
+    },
+    {
+      "type": "extrude",
+      "parameters": {
+        "distance": 0.25
+      }
+    }
+  ]
+}
+Output:
+import cadquery as cq\nresult = (\ncq.Workplane("front")\n
+      .lineTo(2.0, 0)\n
+      .lineTo(2.0, 1.0)\n
+      .threePointArc((1.0, 1.5), (0.0, 1.0))\n
+      .close()\n
+      .extrude(0.25)\n
+      )\n
+
+#3:
+Input:
+{
+  "part_name": "A solid beam with 'H' cross-section",
+  "description": "A solid beam with an 'H' cross-section, defined by a polyline and mirrored along the Y-axis. The overall dimensions are Length=100.0, Height=20.0, Width=20.0, and Thickness=1.0.",
+  "cad_operations": [
+    {
+      "type": "sketch",
+      "plane": "front",
+      "operations": [
+        {
+          "type": "polyline",
+          "parameters": {
+            "points_defined_by_variables": true,
+            "variables": {
+              "L": 100.0,
+              "H": 20.0,
+              "W": 20.0,
+              "t": 1.0
+            },
+            "points": [
+              [0, "H / 2.0"],
+              ["W / 2.0", "H / 2.0"],
+              ["W / 2.0", "(H / 2.0 - t)"],
+              ["t / 2.0", "(H / 2.0 - t)"],
+              ["t / 2.0", "(t - H / 2.0)"],
+              ["W / 2.0", "(t - H / 2.0)"],
+              ["W / 2.0", "H / -2.0"],
+              [0, "H / -2.0"]
+            ]
+          }
+        },
+        {
+          "type": "mirror",
+          "parameters": {
+            "axis": "Y"
+          }
+        }
+      ]
+    },
+    {
+      "type": "extrude",
+      "parameters": {
+        "distance": 100.0
+      }
+    }
+  ]
+}
+Output:
+import cadquery as cq\n(L, H, W, t) = (100.0, 20.0, 20.0, 1.0)\npts = [\n    (0, H / 2.0),\n    (W / 2.0, H / 2.0),\n    (W / 2.0, (H / 2.0 - t)),\n    (t / 2.0, (H / 2.0 - t)),\n    (t / 2.0, (t - H / 2.0)),\n    (W / 2.0, (t - H / 2.0)),\n    (W / 2.0, H / -2.0),\n    (0, H / -2.0),\n]\nresult = cq.Workplane("front").polyline(pts).mirrorY().extrude(L)
+
+#4:
+Input:
+{
+  "part_name": "A prismatic solid with a spline and line segments",
+  "description": "A prismatic solid created in the XY plane from a closed sketch. The profile is defined by two line segments and a spline passing through the specified points. The solid is extruded to a distance of 0.5.",
+  "cad_operations": [
+    {
+      "type": "sketch",
+      "plane": "XY",
+      "operations": [
+        {
+          "type": "line_to",
+          "parameters": {
+            "points": [
+              [3.0, 0],
+              [3.0, 1.0]
+            ]
+          }
+        },
+        {
+          "type": "spline",
+          "parameters": {
+            "points": [
+              [2.75, 1.5],
+              [2.5, 1.75],
+              [2.0, 1.5],
+              [1.5, 1.0],
+              [1.0, 1.25],
+              [0.5, 1.0],
+              [0, 1.0]
+            ],
+            "includeCurrent": true
+          }
+        },
+        {
+          "type": "close_path"
+        }
+      ]
+    },
+    {
+      "type": "extrude",
+      "parameters": {
+        "distance": 0.5
+      }
+    }
+  ]
+}
+Output:
+import cadquery as cq\ns = cq.Workplane("XY")\nsPnts = [\n    (2.75, 1.5),\n    (2.5, 1.75),\n    (2.0, 1.5),\n    (1.5, 1.0),\n    (1.0, 1.25),\n    (0.5, 1.0),\n    (0, 1.0),\n]\nr = s.lineTo(3.0, 0).lineTo(3.0, 1.0).spline(sPnts, includeCurrent=True).close()\nresult = r.extrude(0.5)
+
+#5:
+Input:
+{
+  "part_name": "A rectangular box with angeled holes",
+  "description": "A rectangular box (4.0 x 4.0 x 0.25) with four holes of 0.25 diameter. The holes are located at the vertices of a 1.5 x 1.5 construction rectangle on the top face, and are angled by a 60-degree rotation around the X-axis.",
+  "cad_operations": [
+    {
+      "type": "base_solid",
+      "shape": "box",
+      "parameters": {
+        "length": 4.0,
+        "height": 4.0,
+        "thickness": 0.25,
+        "plane": "front"
+      }
+    },
+    {
+      "type": "modifier",
+      "operation": "cut_hole_at_vertices",
+      "parameters": {
+        "face_selector": ">Z",
+        "diameter": 0.25,
+        "workplane_transform": {
+          "offset": [0, -1.5, 1.0],
+          "rotate": [60, 0, 0]
+        },
+        "construction_rectangle": {
+          "width": 1.5,
+          "height": 1.5
+        }
+      }
+    }
+  ]
+}
+Output:
+import cadquery as cq\nresult = (\n    cq.Workplane("front")\n    .box(4.0, 4.0, 0.25)\n    .faces(">Z")\n    .workplane()\n    .transformed(offset=cq.Vector(0, -1.5, 1.0), rotate=cq.Vector(60, 0, 0))\n    .rect(1.5, 1.5, forConstruction=True)\n    .vertices()\n    .hole(0.25)\n)
+
+#6:
+Input:
+{
+  "part_name": "A parametric bearing pillow block",
+  "description": "A box (length x height x thickness) with a central hole (bearing_diam) on the top face. Four counterbored holes are placed at the vertices of a construction rectangle (length-padding x height-padding) on the same face.",
+  "cad_operations": [
+    {
+      "type": "parameters",
+      "values": {
+        "length": 30.0,
+        "height": 40.0,
+        "bearing_diam": 22.0,
+        "thickness": 10.0,
+        "padding": 8.0
+      }
+    },
+    {
+      "type": "base_solid",
+      "shape": "box",
+      "parameters": {
+        "length": "length",
+        "height": "height",
+        "thickness": "thickness",
+        "plane": "XY"
+      }
+    },
+    {
+      "type": "modifier",
+      "operation": "cut_hole",
+      "parameters": {
+        "face_selector": ">Z",
+        "diameter": "bearing_diam"
+      }
+    },
+    {
+      "type": "modifier",
+      "operation": "counterbored_hole_at_vertices",
+      "parameters": {
+        "face_selector": ">Z",
+        "hole_diameter": 2.4,
+        "counterbore_diameter": 4.4,
+        "counterbore_depth": 2.1,
+        "construction_rectangle": {
+          "width": "length - padding",
+          "height": "height - padding"
+        }
+      }
+    }
+  ]
+}
+Output:
+(length, height, bearing_diam, thickness, padding) = (30.0, 40.0, 22.0, 10.0, 8.0)\n\nresult = (\n    cq.Workplane("XY")\n    .box(length, height, thickness)\n    .faces(">Z")\n    .workplane()\n    .hole(bearing_diam)\n    .faces(">Z")\n    .workplane()\n    .rect(length - padding, height - padding, forConstruction=True)\n    .vertices()\n    .cboreHole(2.4, 4.4, 2.1)\n)
+
+#7:
+Input:
+{
+  "part_name": "A freestyle part",
+  "description": "A complex solid constructed from two separate sketches on custom workplanes, extruded, and then unioned together.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0",
+      "workplane": {
+        "origin": [0.0, -0.1953125, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "type": "move_to",
+          "point": [0.1773, 0.0]
+        },
+        {
+          "type": "line_to",
+          "point": [0.1773, 0.3828]
+        },
+        {
+          "type": "line_to",
+          "point": [0.0, 0.3828]
+        },
+        {
+          "type": "line_to",
+          "point": [0.0, 0.0]
+        },
+        {
+          "type": "close_path"
+        }
+      ],
+      "extrude": {
+        "distance": 0.3047
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1",
+      "workplane": {
+        "origin": [0.1797, -0.1094, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "type": "move_to",
+          "point": [0.3782, 0.0]
+        },
+        {
+          "type": "line_to",
+          "point": [0.5703, 0.1141]
+        },
+        {
+          "type": "line_to",
+          "point": [0.3782, 0.2221]
+        },
+        {
+          "type": "line_to",
+          "point": [0.0, 0.2221]
+        },
+        {
+          "type": "line_to",
+          "point": [0.0, 0.0]
+        },
+        {
+          "type": "close_path"
+        }
+      ],
+      "extrude": {
+        "distance": 0.1797
+      },
+      "combine_operation": "union"
+    }
+  ]
+}
+Output:
+import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(0.0, -0.1953125, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.1773, 0.0)
+        .lineTo(0.1773, 0.3828)
+        .lineTo(0.0, 0.3828)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid0 = wp_sketch0.add(loop0).extrude(0.3047)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(0.1797, -0.1094, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop1 = (
+        wp_sketch1.moveTo(0.3782, 0.0)
+        .lineTo(0.5703, 0.1141)
+        .lineTo(0.3782, 0.2221)
+        .lineTo(0.0, 0.2221)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid1 = wp_sketch1.add(loop1).extrude(0.1797)
+    solid = solid.union(solid1)
+  Name of Part: A freestyle part
+  label: | 
+      Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (0.0, -0.19, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.177, 0.0), draw a line to point (0.177, 0.383), draw a line to point (0.0, 0.383), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 0, extrude the shapes (loop0) by 0.305 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (0.180, -0.109, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 1 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.3782072368421052, 0.0), draw a line to point (0.570, 0.114), draw a line to point (0.378, 0.222), draw a line to point (0.0, 0.22212171052631577), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop1) by 0.1796875 units along the normal direction and union the result with the existing solid.
+- '#': '31'
+  Code: |
+    import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5, -0.6015625, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.0, 0.0)
+        .threePointArc((0.0458, -0.1107), (0.1565, -0.1565))
+        .lineTo(0.8536, -0.1565)
+        .threePointArc((0.9572, -0.1077), (0.9959, 0.0))
+        .lineTo(0.9959, 1.1951)
+        .threePointArc((0.9572, 1.3028), (0.8536, 1.3516))
+        .lineTo(0.1565, 1.3516)
+        .threePointArc((0.0458, 1.3057), (0.0, 1.1951))
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.4979, 0.5975).circle(0.2561)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.15625)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.34375, 0.0, 0.15625),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop2 = wp_sketch1.moveTo(0.3474, 0.0).circle(0.3474)
+    loop3 = wp_sketch1.moveTo(0.3474, 0.0).circle(0.2461)
+    solid1 = wp_sketch1.add(loop2).add(loop3).extrude(0.140625)
+    solid = solid.union(solid1)
+  
+#8:
+Input:
+{
+  "part_name": "A freestyle part",
+  "description": "A complex two-part solid. The first solid is an extruded frame with a central hole. The second solid, a concentric ring shape, is extruded from a different workplane and then unioned with the first.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0",
+      "workplane": {
+        "origin": [-0.5, -0.6015625, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Outer Profile)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0, 0.0]},
+            {"type": "three_point_arc", "end_point": [0.1565, -0.1565], "control_point": [0.0458, -0.1107]},
+            {"type": "line_to", "point": [0.8536, -0.1565]},
+            {"type": "three_point_arc", "end_point": [0.9959, 0.0], "control_point": [0.9572, -0.1077]},
+            {"type": "line_to", "point": [0.9959, 1.1951]},
+            {"type": "three_point_arc", "end_point": [0.8536, 1.3516], "control_point": [0.9572, 1.3028]},
+            {"type": "line_to", "point": [0.1565, 1.3516]},
+            {"type": "three_point_arc", "end_point": [0.0, 1.1951], "control_point": [0.0458, 1.3057]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Inner Circle)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.4979, 0.5975],
+            "radius": 0.2561
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.15625
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1",
+      "workplane": {
+        "origin": [-0.34375, 0.0, 0.15625],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop2 (Outer Ring)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.3474, 0.0],
+            "radius": 0.3474
+          }
+        },
+        {
+          "name": "loop3 (Inner Ring/Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.3474, 0.0],
+            "radius": 0.2461
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.140625
+      },
+      "combine_operation": "union"
+    }
+  ]
+}
+Output:
+ import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5, -0.6015625, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.0, 0.0)
+        .threePointArc((0.0458, -0.1107), (0.1565, -0.1565))
+        .lineTo(0.8536, -0.1565)
+        .threePointArc((0.9572, -0.1077), (0.9959, 0.0))
+        .lineTo(0.9959, 1.1951)
+        .threePointArc((0.9572, 1.3028), (0.8536, 1.3516))
+        .lineTo(0.1565, 1.3516)
+        .threePointArc((0.0458, 1.3057), (0.0, 1.1951))
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.4979, 0.5975).circle(0.2561)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.15625)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.34375, 0.0, 0.15625),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop2 = wp_sketch1.moveTo(0.3474, 0.0).circle(0.3474)
+    loop3 = wp_sketch1.moveTo(0.3474, 0.0).circle(0.2461)
+    solid1 = wp_sketch1.add(loop2).add(loop3).extrude(0.140625)
+    solid = solid.union(solid1)
+
+#9:
+Input:
+{
+  "part_name": "A freestyle part",
+  "description": "A complex two-part solid. The first solid is a thin extrusion with four internal features defined by lines and three-point arcs. The second solid is a simple extruded rectangle, which is then unioned with the first.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0",
+      "workplane": {
+        "origin": [-0.4765625, 0.0, -0.2734375],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Base Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.9609, 0.0]},
+            {"type": "line_to", "point": [0.9609, 0.5361]},
+            {"type": "line_to", "point": [0.0, 0.5361]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Feature 1)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0, 0.0]},
+            {"type": "three_point_arc", "end_point": [0.1416, 0.0607], "control_point": [0.1012, -0.0405]},
+            {"type": "line_to", "point": [0.1416, 0.1821]},
+            {"type": "three_point_arc", "end_point": [0.0910, 0.1821], "control_point": [0.1163, 0.2074]},
+            {"type": "line_to", "point": [0.0910, 0.0607]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop2 (Feature 2)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0910, 0.0607]},
+            {"type": "three_point_arc", "end_point": [0.1416, 0.3641], "control_point": [0.2681, 0.1871]},
+            {"type": "line_to", "point": [0.1416, 0.4855]},
+            {"type": "three_point_arc", "end_point": [0.0910, 0.4855], "control_point": [0.1163, 0.5108]},
+            {"type": "line_to", "point": [0.0910, 0.3641]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop3 (Feature 3)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0910, 0.3641]},
+            {"type": "three_point_arc", "end_point": [0.8699, 0.0607], "control_point": [0.3287, -0.1770]},
+            {"type": "line_to", "point": [0.8699, 0.1821]},
+            {"type": "three_point_arc", "end_point": [0.8193, 0.1821], "control_point": [0.8446, 0.2074]},
+            {"type": "line_to", "point": [0.8193, 0.0607]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop4 (Feature 4)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.8193, 0.0607]},
+            {"type": "three_point_arc", "end_point": [0.8699, 0.3641], "control_point": [0.9963, 0.1871]},
+            {"type": "line_to", "point": [0.8699, 0.4855]},
+            {"type": "three_point_arc", "end_point": [0.8193, 0.4855], "control_point": [0.8446, 0.5108]},
+            {"type": "line_to", "point": [0.8193, 0.3641]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.03125
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1",
+      "workplane": {
+        "origin": [-0.015625, -0.03125, -0.2734375],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop5 (Simple Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.0284, 0.0]},
+            {"type": "line_to", "point": [0.0284, 0.5391]},
+            {"type": "line_to", "point": [0.0, 0.5391]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.2421875
+      },
+      "combine_operation": "union"
+    }
+  ]
+}
+Output:
+ import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.4765625, 0.0, -0.2734375),
+            cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17),
+            cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.9609, 0.0)
+        .lineTo(0.9609, 0.5361)
+        .lineTo(0.0, 0.5361)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = (
+        wp_sketch0.moveTo(0.0, 0.0)
+        .threePointArc((0.1012, -0.0405), (0.1416, 0.0607))
+        .lineTo(0.1416, 0.1821)
+        .threePointArc((0.1163, 0.2074), (0.0910, 0.1821))
+        .lineTo(0.0910, 0.0607)
+        .close()
+    )
+    loop2 = (
+        wp_sketch0.moveTo(0.0910, 0.0607)
+        .threePointArc((0.2681, 0.1871), (0.1416, 0.3641))
+        .lineTo(0.1416, 0.4855)
+        .threePointArc((0.1163, 0.5108), (0.0910, 0.4855))
+        .lineTo(0.0910, 0.3641)
+        .close()
+    )
+    loop3 = (
+        wp_sketch0.moveTo(0.0910, 0.3641)
+        .threePointArc((0.3287, -0.1770), (0.8699, 0.0607))
+        .lineTo(0.8699, 0.1821)
+        .threePointArc((0.8446, 0.2074), (0.8193, 0.1821))
+        .lineTo(0.8193, 0.0607)
+        .close()
+    )
+    loop4 = (
+        wp_sketch0.moveTo(0.8193, 0.0607)
+        .threePointArc((0.9963, 0.1871), (0.8699, 0.3641))
+        .lineTo(0.8699, 0.4855)
+        .threePointArc((0.8446, 0.5108), (0.8193, 0.4855))
+        .lineTo(0.8193, 0.3641)
+        .close()
+    )
+    solid0 = wp_sketch0.add(loop0).add(loop1).add(loop2).add(loop3).add(loop4).extrude(0.03125)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.015625, -0.03125, -0.2734375),
+            cq.Vector(1.0, 6.123233995736766e-17, -6.123233995736766e-17),
+            cq.Vector(6.123233995736766e-17, -1.0, 6.123233995736766e-17),
+        )
+    )
+    loop5 = (
+        wp_sketch1.moveTo(0.0284, 0.0)
+        .lineTo(0.0284, 0.5391)
+        .lineTo(0.0, 0.5391)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid1 = wp_sketch1.add(loop5).extrude(0.2421875)
+    solid = solid.union(solid1)
+
+#10:
+Input:
+{
+  "part_name": "A freestyle part",
+  "description": "A complex solid constructed from four separate sketches on custom workplanes. The resulting extruded parts are all unioned together.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0",
+      "workplane": {
+        "origin": [-0.46875, 0.25, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Outer Frame)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.5, 0.0]},
+            {"type": "line_to", "point": [0.5, 0.1737]},
+            {"type": "line_to", "point": [0.4053, 0.1737]},
+            {"type": "line_to", "point": [0.4053, 0.3263]},
+            {"type": "line_to", "point": [0.5, 0.3263]},
+            {"type": "line_to", "point": [0.5, 0.5]},
+            {"type": "line_to", "point": [0.0, 0.5]},
+            {"type": "line_to", "point": [0.0, 0.3263]},
+            {"type": "line_to", "point": [0.0947, 0.3263]},
+            {"type": "line_to", "point": [0.0947, 0.1737]},
+            {"type": "line_to", "point": [0.0, 0.1737]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Central Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.2526, 0.2526],
+            "radius": 0.0579
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.125
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1",
+      "workplane": {
+        "origin": [-0.46875, 0.0, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop2 (Base Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.5, 0.0]},
+            {"type": "line_to", "point": [0.5, 0.2526]},
+            {"type": "line_to", "point": [0.0, 0.2526]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop3 (Central Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.2526, 0.1263],
+            "radius": 0.0632
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.125
+      },
+      "combine_operation": "union"
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid2",
+      "workplane": {
+        "origin": [-0.46875, 0.4296875, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop4 (Left Upper Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.09375, 0.0]},
+            {"type": "line_to", "point": [0.09375, 0.1484]},
+            {"type": "line_to", "point": [0.0, 0.1484]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.25
+      },
+      "combine_operation": "union"
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid3",
+      "workplane": {
+        "origin": [-0.0625, 0.4296875, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop5 (Right Upper Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.09375, 0.0]},
+            {"type": "line_to", "point": [0.09375, 0.1484]},
+            {"type": "line_to", "point": [0.0, 0.1484]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.25
+      },
+      "combine_operation": "union"
+    }
+  ]
+}
+Output:
+  import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.46875, 0.25, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.5, 0.0)
+        .lineTo(0.5, 0.1737)
+        .lineTo(0.4053, 0.1737)
+        .lineTo(0.4053, 0.3263)
+        .lineTo(0.5, 0.3263)
+        .lineTo(0.5, 0.5)
+        .lineTo(0.0, 0.5)
+        .lineTo(0.0, 0.3263)
+        .lineTo(0.0947, 0.3263)
+        .lineTo(0.0947, 0.1737)
+        .lineTo(0.0, 0.1737)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.2526, 0.2526).circle(0.0579)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.125)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.46875, 0.0, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop2 = (
+        wp_sketch1.moveTo(0.5, 0.0)
+        .lineTo(0.5, 0.2526)
+        .lineTo(0.0, 0.2526)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop3 = wp_sketch1.moveTo(0.2526, 0.1263).circle(0.0632)
+    solid1 = wp_sketch1.add(loop2).add(loop3).extrude(0.125)
+    solid = solid.union(solid1)
+
+    # Generating a workplane for sketch 2
+    wp_sketch2 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.46875, 0.4296875, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop4 = (
+        wp_sketch2.moveTo(0.09375, 0.0)
+        .lineTo(0.09375, 0.1484)
+        .lineTo(0.0, 0.1484)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid2 = wp_sketch2.add(loop4).extrude(0.25)
+    solid = solid.union(solid2)
+
+    # Generating a workplane for sketch 3
+    wp_sketch3 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.0625, 0.4296875, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop5 = (
+        wp_sketch3.moveTo(0.09375, 0.0)
+        .lineTo(0.09375, 0.1484)
+        .lineTo(0.0, 0.1484)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid3 = wp_sketch3.add(loop5).extrude(0.25)
+    solid = solid.union(solid3)
+
+#11:
+Input:
+{
+  "part_name": "A freestyle part",
+  "description": "A base rectangular plate with a central circular cutout, followed by three separate cutting operations (a slot, and two specialized curved cuts) extruded negatively from custom workplanes.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0 (Base Plate)",
+      "workplane": {
+        "origin": [-0.5625, -0.375, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Outer Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [1.125, 0.0]},
+            {"type": "line_to", "point": [1.125, 0.7461]},
+            {"type": "line_to", "point": [0.0, 0.7461]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Central Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.5684, 0.379],
+            "radius": 0.1895
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.1875
+      }
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid1 (Left Slot Cut)",
+      "workplane": {
+        "origin": [-0.5234, -0.375, 0.1875],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop2 (Rectangle Cut)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.0947, 0.0]},
+            {"type": "line_to", "point": [0.0947, 0.75]},
+            {"type": "line_to", "point": [0.0, 0.75]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": -0.0391
+      },
+      "combine_operation": "cut"
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid2 (Top Arc Cut)",
+      "workplane": {
+        "origin": [-0.09375, 0.1641, 0.1875],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop3 (Arc Cutout)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0, 0.0]},
+            {"type": "three_point_arc", "end_point": [0.1865, 0.0], "control_point": [0.0933, 0.0252]},
+            {"type": "line_to", "point": [0.1865, 0.2109]},
+            {"type": "line_to", "point": [0.0, 0.2109]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": -0.0391
+      },
+      "combine_operation": "cut"
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid3 (Bottom Arc Cut)",
+      "workplane": {
+        "origin": [-0.09375, -0.375, 0.1875],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop4 (Inverted Arc Cutout)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.1865, 0.0]},
+            {"type": "line_to", "point": [0.1865, 0.2109]},
+            {"type": "three_point_arc", "end_point": [0.0, 0.2109], "control_point": [0.0933, 0.1857]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": -0.0391
+      },
+      "combine_operation": "cut"
+    }
+  ]
+}
+Output:
+  import cadquery as cq
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5625, -0.375, 0.0),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(1.125, 0.0)
+        .lineTo(1.125, 0.7461)
+        .lineTo(0.0, 0.7461)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.5684, 0.379).circle(0.1895)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.1875)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5234, -0.375, 0.1875),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop2 = (
+        wp_sketch1.moveTo(0.0947, 0.0)
+        .lineTo(0.0947, 0.75)
+        .lineTo(0.0, 0.75)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid1 = wp_sketch1.add(loop2).extrude(-0.0391)
+    solid = solid.cut(solid1)
+
+    # Generating a workplane for sketch 2
+    wp_sketch2 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.09375, 0.1641, 0.1875),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop3 = (
+        wp_sketch2.moveTo(0.0, 0.0)
+        .threePointArc((0.0933, 0.0252), (0.1865, 0.0))
+        .lineTo(0.1865, 0.2109)
+        .lineTo(0.0, 0.2109)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid2 = wp_sketch2.add(loop3).extrude(-0.0391)
+    solid = solid.cut(solid2)
+
+    # Generating a workplane for sketch 3
+    wp_sketch3 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.09375, -0.375, 0.1875),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop4 = (
+        wp_sketch3.moveTo(0.1865, 0.0)
+        .lineTo(0.1865, 0.2109)
+        .threePointArc((0.0933, 0.1857), (0.0, 0.2109))
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid3 = wp_sketch3.add(loop4).extrude(-0.0391)
+    solid = solid.cut(solid3)
+
+#12:
+Input:
+{
+  "part_name": "A freestyle part",
+  "description": "A complex solid constructed from four unioned extruded parts and two subsequent cut operations. The base features include a rounded, recessed top shape and an internal concentric ring.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0 (Top Base)",
+      "workplane": {
+        "origin": [-0.5859, 0.0, 0.0391],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Outer Profile)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.2921, 0.0]},
+            {"type": "line_to", "point": [0.5781, 0.0]},
+            {"type": "line_to", "point": [0.4808, 0.2799]},
+            {"type": "three_point_arc", "end_point": [0.0974, 0.2799], "control_point": [0.2891, 0.4277]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Central Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.2921, 0.2252],
+            "radius": 0.1156
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.4531
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1 (Bottom Base)",
+      "workplane": {
+        "origin": [-0.75, 0.0, -0.03125],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop2 (Notched Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.4539, 0.0]},
+            {"type": "line_to", "point": [0.8984, 0.0]},
+            {"type": "line_to", "point": [0.8984, 0.0662]},
+            {"type": "line_to", "point": [0.7377, 0.0662]},
+            {"type": "line_to", "point": [0.4539, 0.0662]},
+            {"type": "line_to", "point": [0.1608, 0.0662]},
+            {"type": "line_to", "point": [0.0, 0.0662]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.4531
+      },
+      "combine_operation": "union"
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid2 (Central Tube)",
+      "workplane": {
+        "origin": [-0.4141, 0.0, 0.2578],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop3 (Outer Circle)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.1105, 0.0],
+            "radius": 0.1082
+          }
+        },
+        {
+          "name": "loop4 (Inner Circle/Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.1105, 0.0],
+            "radius": 0.0806
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.5156
+      },
+      "combine_operation": "union"
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid3 (Left Symmetrical Cut)",
+      "workplane": {
+        "origin": [-0.7109, -0.2266, 0.0391],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop5 (Small Circle)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.0395, 0.0],
+            "radius": 0.0395
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.0781,
+        "symmetrical": true
+      },
+      "combine_operation": "cut"
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid4 (Right Symmetrical Cut)",
+      "workplane": {
+        "origin": [0.03125, -0.2266, 0.0391],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop6 (Small Circle)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.0387, 0.0],
+            "radius": 0.0387
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.0781,
+        "symmetrical": true
+      },
+      "combine_operation": "cut"
+    }
+  ]
+}
+Output:
+ import cadquery as cq
+
+    # Generating a workplane for sketch 0
+    wp_sketch0 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.5859, 0.0, 0.0391),
+            cq.Vector(1.0, 6.12e-17, -6.12e-17),
+            cq.Vector(6.12e-17, -1.0, 6.12e-17),
+        )
+    )
+    loop0 = (
+        wp_sketch0.moveTo(0.2921, 0.0)
+        .lineTo(0.5781, 0.0)
+        .lineTo(0.4808, 0.2799)
+        .threePointArc((0.2891, 0.4277), (0.0974, 0.2799))
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    loop1 = wp_sketch0.moveTo(0.2921, 0.2252).circle(0.1156)
+    solid0 = wp_sketch0.add(loop0).add(loop1).extrude(0.4531)
+    solid = solid0
+
+    # Generating a workplane for sketch 1
+    wp_sketch1 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.75, 0.0, -0.03125),
+            cq.Vector(1.0, 6.12e-17, -6.12e-17),
+            cq.Vector(6.12e-17, -1.0, 6.12e-17),
+        )
+    )
+    loop2 = (
+        wp_sketch1.moveTo(0.4539, 0.0)
+        .lineTo(0.8984, 0.0)
+        .lineTo(0.8984, 0.0662)
+        .lineTo(0.7377, 0.0662)
+        .lineTo(0.4539, 0.0662)
+        .lineTo(0.1608, 0.0662)
+        .lineTo(0.0, 0.0662)
+        .lineTo(0.0, 0.0)
+        .close()
+    )
+    solid1 = wp_sketch1.add(loop2).extrude(0.4531)
+    solid = solid.union(solid1)
+
+    # Generating a workplane for sketch 2
+    wp_sketch2 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.4141, 0.0, 0.2578),
+            cq.Vector(1.0, 6.12e-17, -6.12e-17),
+            cq.Vector(6.12e-17, -1.0, 6.12e-17),
+        )
+    )
+    loop3 = wp_sketch2.moveTo(0.1105, 0.0).circle(0.1082)
+    loop4 = wp_sketch2.moveTo(0.1105, 0.0).circle(0.0806)
+    solid2 = wp_sketch2.add(loop3).add(loop4).extrude(0.5156)
+    solid = solid.union(solid2)
+
+    # Generating a workplane for sketch 3
+    wp_sketch3 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(-0.7109, -0.2266, 0.0391),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop5 = wp_sketch3.moveTo(0.0395, 0.0).circle(0.0395)
+    solid3 = wp_sketch3.add(loop5).extrude(0.0781, both=True)
+    solid = solid.cut(solid3)
+
+    # Generating a workplane for sketch 4
+    wp_sketch4 = cq.Workplane(
+        cq.Plane(
+            cq.Vector(0.03125, -0.2266, 0.0391),
+            cq.Vector(1.0, 0.0, 0.0),
+            cq.Vector(0.0, 0.0, 1.0),
+        )
+    )
+    loop6 = wp_sketch4.moveTo(0.0387, 0.0).circle(0.0387)
+    solid4 = wp_sketch4.add(loop6).extrude(0.0781, both=True)
+    solid = solid.cut(solid4)

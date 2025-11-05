@@ -20,14 +20,17 @@ OUTPUT FORMAT: Use this JSON structure but with ACTUAL VALUES instead of express
 RULES:
 1. Calculate ALL values and expressions yourself
 2. Use actual numbers, not mathematical expressions
-3. Output ONLY valid JSON, no other text
+3. Output ONLY valid JSON, if you cannot, reply with ERROR_JSON.
+4. Make sure that the property name is enclosed in double quotes.
 
-EXAMPLE:
-Input: "A rectangular plate with length 4 mm, height 3 mm, and thickness 0.5 mm, with filleted edges."
+EXAMPLES:
+#1:
+Input: "A rectangular plate with length of 4 mm, height of 3 mm and a thickness of
+    0.5 mm\nThe edges of the plate are filleted with a fillet radius of 0.5 mm"
 Output:
 {
   "part_name": "Simple Rectangular Plate",
-  "description": "A rectangular plate with length 4 mm, height 3 mm, and thickness 0.5 mm, with filleted edges.",
+  "description": "A rectangular plate with length of 4 mm, height of 3 mm and a thickness of 0.5 mm. The edges of the plate are filleted with a fillet radius of 0.5 mm.",
   "cad_operations": [
     {
       "type": "base_solid",
@@ -35,7 +38,8 @@ Output:
       "parameters": {
         "length": 4,
         "height": 3,
-        "thickness": 0.5
+        "thickness": 0.5,
+        "plane": "XY"
       }
     },
     {
@@ -45,6 +49,907 @@ Output:
         "selector": "edges(\"|Z\")",
         "radius": 0.5
       }
+    }
+  ]
+}
+
+#2:
+Input:"A prismatic solid created in the front plane with a three-point arc and line segments. The arc connects the points (2.0, 1.0) and (0.0, 1.0) with a control point at (1.0, 1.5). The solid is extruded to a height of 0.25 mm."
+Output:
+{
+  "part_name": "A prismatic solid with a three-point arc and line segments",
+  "description": "A prismatic solid created in the front plane from a closed sketch. The sketch uses line segments and a three-point arc to define the profile, which is then extruded to a height of 0.25.",
+  "cad_operations": [
+    {
+      "type": "sketch",
+      "plane": "front",
+      "operations": [
+        {
+          "type": "line_to",
+          "parameters": {
+            "points": [
+              [2.0, 0],
+              [2.0, 1.0]
+            ]
+          }
+        },
+        {
+          "type": "three_point_arc",
+          "parameters": {
+            "end_point": [0.0, 1.0],
+            "control_point": [1.0, 1.5]
+          }
+        },
+        {
+          "type": "close_path"
+        }
+      ]
+    },
+    {
+      "type": "extrude",
+      "parameters": {
+        "distance": 0.25
+      }
+    }
+  ]
+}
+
+#3:
+Input: "A solid beam with a length of 100 mm, height of 20 mm, width of 20 mm and a thickness of 1 mm. The cross-section is an 'H' shape with the specified points."
+Output:
+{
+  "part_name": "A solid beam with 'H' cross-section",
+  "description": "A solid beam with an 'H' cross-section, defined by a polyline and mirrored along the Y-axis. The overall dimensions are Length=100.0, Height=20.0, Width=20.0, and Thickness=1.0.",
+  "cad_operations": [
+    {
+      "type": "sketch",
+      "plane": "front",
+      "operations": [
+        {
+          "type": "polyline",
+          "parameters": {
+            "points_defined_by_variables": true,
+            "variables": {
+              "L": 100.0,
+              "H": 20.0,
+              "W": 20.0,
+              "t": 1.0
+            },
+            "points": [
+              [0, "H / 2.0"],
+              ["W / 2.0", "H / 2.0"],
+              ["W / 2.0", "(H / 2.0 - t)"],
+              ["t / 2.0", "(H / 2.0 - t)"],
+              ["t / 2.0", "(t - H / 2.0)"],
+              ["W / 2.0", "(t - H / 2.0)"],
+              ["W / 2.0", "H / -2.0"],
+              [0, "H / -2.0"]
+            ]
+          }
+        },
+        {
+          "type": "mirror",
+          "parameters": {
+            "axis": "Y"
+          }
+        }
+      ]
+    },
+    {
+      "type": "extrude",
+      "parameters": {
+        "distance": 100.0
+      }
+    }
+  ]
+}
+
+#4:
+Input: "A prismatic solid created in the XY plane with a spline and line segments. The spline connects the points (2.75, 1.5), (2.5, 1.75), (2.0, 1.5), (1.5, 1.0), (1.0, 1.25), (0.5, 1.0), and (0, 1.0). The solid is extruded to a height of 0.5 mm.
+Output:
+{
+  "part_name": "A prismatic solid with a spline and line segments",
+  "description": "A prismatic solid created in the XY plane from a closed sketch. The profile is defined by two line segments and a spline passing through the specified points. The solid is extruded to a distance of 0.5.",
+  "cad_operations": [
+    {
+      "type": "sketch",
+      "plane": "XY",
+      "operations": [
+        {
+          "type": "line_to",
+          "parameters": {
+            "points": [
+              [3.0, 0],
+              [3.0, 1.0]
+            ]
+          }
+        },
+        {
+          "type": "spline",
+          "parameters": {
+            "points": [
+              [2.75, 1.5],
+              [2.5, 1.75],
+              [2.0, 1.5],
+              [1.5, 1.0],
+              [1.0, 1.25],
+              [0.5, 1.0],
+              [0, 1.0]
+            ],
+            "includeCurrent": true
+          }
+        },
+        {
+          "type": "close_path"
+        }
+      ]
+    },
+    {
+      "type": "extrude",
+      "parameters": {
+        "distance": 0.5
+      }
+    }
+  ]
+}
+#5:
+Input: "A rectangular box with a length of 4 mm, height of 4 mm and a thickness of 0.25 mm. The box has holes at an angle of 60 degrees from the Z-axis, with a diameter of 0.25 mm, located at the center of the top face."
+Output:
+{
+  "part_name": "A rectangular box with angeled holes",
+  "description": "A rectangular box (4.0 x 4.0 x 0.25) with four holes of 0.25 diameter. The holes are located at the vertices of a 1.5 x 1.5 construction rectangle on the top face, and are angled by a 60-degree rotation around the X-axis.",
+  "cad_operations": [
+    {
+      "type": "base_solid",
+      "shape": "box",
+      "parameters": {
+        "length": 4.0,
+        "height": 4.0,
+        "thickness": 0.25,
+        "plane": "front"
+      }
+    },
+    {
+      "type": "modifier",
+      "operation": "cut_hole_at_vertices",
+      "parameters": {
+        "face_selector": ">Z",
+        "diameter": 0.25,
+        "workplane_transform": {
+          "offset": [0, -1.5, 1.0],
+          "rotate": [60, 0, 0]
+        },
+        "construction_rectangle": {
+          "width": 1.5,
+          "height": 1.5
+        }
+      }
+    }
+  ]
+}
+#6:
+Input: "A box with dimensions length x height x  thickness created on the XY plane. A central hole with diameter bearing_diam is drilled on the top face. On the same face, a construction rectangle smaller by padding is created, and countersunk holes are drilled at its vertices."
+Output:
+{
+  "part_name": "A parametric bearing pillow block",
+  "description": "A box (length x height x thickness) with a central hole (bearing_diam) on the top face. Four counterbored holes are placed at the vertices of a construction rectangle (length-padding x height-padding) on the same face.",
+  "cad_operations": [
+    {
+      "type": "parameters",
+      "values": {
+        "length": 30.0,
+        "height": 40.0,
+        "bearing_diam": 22.0,
+        "thickness": 10.0,
+        "padding": 8.0
+      }
+    },
+    {
+      "type": "base_solid",
+      "shape": "box",
+      "parameters": {
+        "length": "length",
+        "height": "height",
+        "thickness": "thickness",
+        "plane": "XY"
+      }
+    },
+    {
+      "type": "modifier",
+      "operation": "cut_hole",
+      "parameters": {
+        "face_selector": ">Z",
+        "diameter": "bearing_diam"
+      }
+    },
+    {
+      "type": "modifier",
+      "operation": "counterbored_hole_at_vertices",
+      "parameters": {
+        "face_selector": ">Z",
+        "hole_diameter": 2.4,
+        "counterbore_diameter": 4.4,
+        "counterbore_depth": 2.1,
+        "construction_rectangle": {
+          "width": "length - padding",
+          "height": "height - padding"
+        }
+      }
+    }
+  ]
+}
+#7:
+Input: "Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (0.0, -0.19, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.177, 0.0), draw a line to point (0.177, 0.383), draw a line to point (0.0, 0.383), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 0, extrude the shapes (loop0) by 0.305 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (0.180, -0.109, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 1 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.3782072368421052, 0.0), draw a line to point (0.570, 0.114), draw a line to point (0.378, 0.222), draw a line to point (0.0, 0.22212171052631577), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop1) by 0.1796875 units along the normal direction and union the result with the existing solid."
+Ouput: 
+{
+  "part_name": "A freestyle part",
+  "description": "A complex solid constructed from two separate sketches on custom workplanes, extruded, and then unioned together.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0",
+      "workplane": {
+        "origin": [0.0, -0.1953125, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "type": "move_to",
+          "point": [0.1773, 0.0]
+        },
+        {
+          "type": "line_to",
+          "point": [0.1773, 0.3828]
+        },
+        {
+          "type": "line_to",
+          "point": [0.0, 0.3828]
+        },
+        {
+          "type": "line_to",
+          "point": [0.0, 0.0]
+        },
+        {
+          "type": "close_path"
+        }
+      ],
+      "extrude": {
+        "distance": 0.3047
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1",
+      "workplane": {
+        "origin": [0.1797, -0.1094, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "type": "move_to",
+          "point": [0.3782, 0.0]
+        },
+        {
+          "type": "line_to",
+          "point": [0.5703, 0.1141]
+        },
+        {
+          "type": "line_to",
+          "point": [0.3782, 0.2221]
+        },
+        {
+          "type": "line_to",
+          "point": [0.0, 0.2221]
+        },
+        {
+          "type": "line_to",
+          "point": [0.0, 0.0]
+        },
+        {
+          "type": "close_path"
+        }
+      ],
+      "extrude": {
+        "distance": 0.1797
+      },
+      "combine_operation": "union"
+    }
+  ]
+}
+#8:
+Input: "Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.5, -0.6015625, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.04583682527976966, -0.11065988524654614) to endpoint (0.1564967105263158, -0.1564967105263158), draw a line to point (0.8536184210526316, -0.1564967105263158), draw a three-point arc through midpoint (0.9571648194570725, -0.1077133825207835) to endpoint (0.995888157894737, 0.0), draw a line to point (0.995888157894737, 1.1950657894736842), draw a three-point arc through midpoint (0.9571648194570725, 1.3027791719944677) to endpoint (0.8536184210526316, 1.3515625), draw a line to point (0.1564967105263158, 1.3515625), draw a three-point arc through midpoint (0.04583682527976966, 1.3057256747202304) to endpoint (0.0, 1.1950657894736842), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.4979440789473685, 0.5975328947368421) and draw a circle with radius 0.2560855263157895. For sketch 0, extrude the shapes (loop0, loop1) by 0.15625 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.34375, 0.0, 0.15625), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 2 in sketch 1, create a closed shape by performing the following operation: move to (0.34736842105263155, 0.0) and draw a circle with radius 0.34736842105263155. For loop 3 in sketch 1, create a closed shape by performing the following operation: move to (0.34736842105263155, 0.0) and draw a circle with radius 0.24605263157894736. For sketch 1, extrude the shapes (loop2, loop3) by 0.140625 units along the normal direction and union the result with the existing solid."
+Ouput: 
+{
+  "part_name": "A freestyle part",
+  "description": "A complex two-part solid. The first solid is an extruded frame with a central hole. The second solid, a concentric ring shape, is extruded from a different workplane and then unioned with the first.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0",
+      "workplane": {
+        "origin": [-0.5, -0.6015625, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Outer Profile)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0, 0.0]},
+            {"type": "three_point_arc", "end_point": [0.1565, -0.1565], "control_point": [0.0458, -0.1107]},
+            {"type": "line_to", "point": [0.8536, -0.1565]},
+            {"type": "three_point_arc", "end_point": [0.9959, 0.0], "control_point": [0.9572, -0.1077]},
+            {"type": "line_to", "point": [0.9959, 1.1951]},
+            {"type": "three_point_arc", "end_point": [0.8536, 1.3516], "control_point": [0.9572, 1.3028]},
+            {"type": "line_to", "point": [0.1565, 1.3516]},
+            {"type": "three_point_arc", "end_point": [0.0, 1.1951], "control_point": [0.0458, 1.3057]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Inner Circle)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.4979, 0.5975],
+            "radius": 0.2561
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.15625
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1",
+      "workplane": {
+        "origin": [-0.34375, 0.0, 0.15625],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop2 (Outer Ring)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.3474, 0.0],
+            "radius": 0.3474
+          }
+        },
+        {
+          "name": "loop3 (Inner Ring/Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.3474, 0.0],
+            "radius": 0.2461
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.140625
+      },
+      "combine_operation": "union"
+    }
+  ]
+}
+#9:
+Input: "Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.4765625, 0.0, -0.2734375), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.9609375, 0.0), draw a line to point (0.9609375, 0.5361019736842105), draw a line to point (0.0, 0.5361019736842105), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.10115131578947369, -0.040460526315789475) to endpoint (0.14161184210526317, 0.06069078947368421), draw a line to point (0.14161184210526317, 0.18207236842105262), draw a three-point arc through midpoint (0.11632401315789474, 0.20736019736842107) to endpoint (0.09103618421052631, 0.18207236842105262), and draw a line to point (0.09103618421052631, 0.06069078947368421), and then close the loop. For loop 2 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.09103618421052631, 0.06069078947368421) and draw a three-point arc through midpoint (0.26805098684210527, 0.18712993421052632) to endpoint (0.14161184210526317, 0.36414473684210524), draw a line to point (0.14161184210526317, 0.4855263157894737), draw a three-point arc through midpoint (0.11632401315789474, 0.5108141447368422) to endpoint (0.09103618421052631, 0.4855263157894737), and draw a line to point (0.09103618421052631, 0.36414473684210524), and then close the loop. For loop 3 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.09103618421052631, 0.36414473684210524) and draw a three-point arc through midpoint (0.3287417763157895, -0.17701480263157895) to endpoint (0.8699013157894737, 0.06069078947368421), draw a line to point (0.8699013157894737, 0.18207236842105262), draw a three-point arc through midpoint (0.8446134868421052, 0.20736019736842107) to endpoint (0.8193256578947369, 0.18207236842105262), and draw a line to point (0.8193256578947369, 0.06069078947368421), and then close the loop. For loop 4 in sketch 0, create a closed shape by performing the following operations in sequence: move to (0.8193256578947369, 0.06069078947368421) and draw a three-point arc through midpoint (0.9963404605263159, 0.18712993421052632) to endpoint (0.8699013157894737, 0.36414473684210524), draw a line to point (0.8699013157894737, 0.4855263157894737), draw a three-point arc through midpoint (0.8446134868421052, 0.5108141447368422) to endpoint (0.8193256578947369, 0.4855263157894737), and draw a line to point (0.8193256578947369, 0.36414473684210524), and then close the loop. For sketch 0, extrude the shapes (loop0, loop1, loop2, loop3, loop4) by 0.03125 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.015625, -0.03125, -0.2734375), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 5 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.02837171052631579, 0.0), draw a line to point (0.02837171052631579, 0.5390625), draw a line to point (0.0, 0.5390625), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop5) by 0.2421875 units along the normal direction and union the result with the existing solid."
+Ouput: 
+{
+  "part_name": "A freestyle part",
+  "description": "A complex two-part solid. The first solid is a thin extrusion with four internal features defined by lines and three-point arcs. The second solid is a simple extruded rectangle, which is then unioned with the first.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0",
+      "workplane": {
+        "origin": [-0.4765625, 0.0, -0.2734375],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Base Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.9609, 0.0]},
+            {"type": "line_to", "point": [0.9609, 0.5361]},
+            {"type": "line_to", "point": [0.0, 0.5361]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Feature 1)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0, 0.0]},
+            {"type": "three_point_arc", "end_point": [0.1416, 0.0607], "control_point": [0.1012, -0.0405]},
+            {"type": "line_to", "point": [0.1416, 0.1821]},
+            {"type": "three_point_arc", "end_point": [0.0910, 0.1821], "control_point": [0.1163, 0.2074]},
+            {"type": "line_to", "point": [0.0910, 0.0607]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop2 (Feature 2)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0910, 0.0607]},
+            {"type": "three_point_arc", "end_point": [0.1416, 0.3641], "control_point": [0.2681, 0.1871]},
+            {"type": "line_to", "point": [0.1416, 0.4855]},
+            {"type": "three_point_arc", "end_point": [0.0910, 0.4855], "control_point": [0.1163, 0.5108]},
+            {"type": "line_to", "point": [0.0910, 0.3641]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop3 (Feature 3)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0910, 0.3641]},
+            {"type": "three_point_arc", "end_point": [0.8699, 0.0607], "control_point": [0.3287, -0.1770]},
+            {"type": "line_to", "point": [0.8699, 0.1821]},
+            {"type": "three_point_arc", "end_point": [0.8193, 0.1821], "control_point": [0.8446, 0.2074]},
+            {"type": "line_to", "point": [0.8193, 0.0607]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop4 (Feature 4)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.8193, 0.0607]},
+            {"type": "three_point_arc", "end_point": [0.8699, 0.3641], "control_point": [0.9963, 0.1871]},
+            {"type": "line_to", "point": [0.8699, 0.4855]},
+            {"type": "three_point_arc", "end_point": [0.8193, 0.4855], "control_point": [0.8446, 0.5108]},
+            {"type": "line_to", "point": [0.8193, 0.3641]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.03125
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1",
+      "workplane": {
+        "origin": [-0.015625, -0.03125, -0.2734375],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop5 (Simple Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.0284, 0.0]},
+            {"type": "line_to", "point": [0.0284, 0.5391]},
+            {"type": "line_to", "point": [0.0, 0.5391]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.2421875
+      },
+      "combine_operation": "union"
+    }
+  ]
+}
+#10:
+Input: "Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.46875, 0.25, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.5, 0.0), draw a line to point (0.5, 0.17368421052631577), draw a line to point (0.4052631578947368, 0.17368421052631577), draw a line to point (0.4052631578947368, 0.3263157894736842), draw a line to point (0.5, 0.3263157894736842), draw a line to point (0.5, 0.5), draw a line to point (0.0, 0.5), draw a line to point (0.0, 0.3263157894736842), draw a line to point (0.09473684210526316, 0.3263157894736842), draw a line to point (0.09473684210526316, 0.17368421052631577), draw a line to point (0.0, 0.17368421052631577), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.25263157894736843, 0.25263157894736843) and draw a circle with radius 0.05789473684210526. For sketch 0, extrude the shapes (loop0, loop1) by 0.125 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.46875, 0.0, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 2 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.5, 0.0), draw a line to point (0.5, 0.25263157894736843), draw a line to point (0.0, 0.25263157894736843), and draw a line to point (0.0, 0.0), and then close the loop. For loop 3 in sketch 1, create a closed shape by performing the following operation: move to (0.25263157894736843, 0.12631578947368421) and draw a circle with radius 0.06315789473684211. For sketch 1, extrude the shapes (loop2, loop3) by 0.125 units along the normal direction and union the result with the existing solid. For sketch 2, create a workplane with an origin at coordinates (-0.46875, 0.4296875, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 4 in sketch 2, create a closed shape by performing the following operations in sequence: move to point (0.09375, 0.0), draw a line to point (0.09375, 0.1484375), draw a line to point (0.0, 0.1484375), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 2, extrude the shapes (loop4) by 0.25 units along the normal direction and union the result with the existing solid. For sketch 3, create a workplane with an origin at coordinates (-0.0625, 0.4296875, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 5 in sketch 3, create a closed shape by performing the following operations in sequence: move to point (0.09375, 0.0), draw a line to point (0.09375, 0.1484375), draw a line to point (0.0, 0.1484375), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 3, extrude the shapes (loop5) by 0.25 units along the normal direction and union the result with the existing solid."
+Output: 
+{
+  "part_name": "A freestyle part",
+  "description": "A complex solid constructed from four separate sketches on custom workplanes. The resulting extruded parts are all unioned together.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0",
+      "workplane": {
+        "origin": [-0.46875, 0.25, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Outer Frame)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.5, 0.0]},
+            {"type": "line_to", "point": [0.5, 0.1737]},
+            {"type": "line_to", "point": [0.4053, 0.1737]},
+            {"type": "line_to", "point": [0.4053, 0.3263]},
+            {"type": "line_to", "point": [0.5, 0.3263]},
+            {"type": "line_to", "point": [0.5, 0.5]},
+            {"type": "line_to", "point": [0.0, 0.5]},
+            {"type": "line_to", "point": [0.0, 0.3263]},
+            {"type": "line_to", "point": [0.0947, 0.3263]},
+            {"type": "line_to", "point": [0.0947, 0.1737]},
+            {"type": "line_to", "point": [0.0, 0.1737]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Central Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.2526, 0.2526],
+            "radius": 0.0579
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.125
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1",
+      "workplane": {
+        "origin": [-0.46875, 0.0, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop2 (Base Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.5, 0.0]},
+            {"type": "line_to", "point": [0.5, 0.2526]},
+            {"type": "line_to", "point": [0.0, 0.2526]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop3 (Central Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.2526, 0.1263],
+            "radius": 0.0632
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.125
+      },
+      "combine_operation": "union"
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid2",
+      "workplane": {
+        "origin": [-0.46875, 0.4296875, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop4 (Left Upper Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.09375, 0.0]},
+            {"type": "line_to", "point": [0.09375, 0.1484]},
+            {"type": "line_to", "point": [0.0, 0.1484]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.25
+      },
+      "combine_operation": "union"
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid3",
+      "workplane": {
+        "origin": [-0.0625, 0.4296875, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop5 (Right Upper Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.09375, 0.0]},
+            {"type": "line_to", "point": [0.09375, 0.1484]},
+            {"type": "line_to", "point": [0.0, 0.1484]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.25
+      },
+      "combine_operation": "union"
+    }
+  ]
+}
+#11:
+Input: "Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.5625, -0.375, 0.0), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (1.125, 0.0), draw a line to point (1.125, 0.7460526315789474), draw a line to point (0.0, 0.7460526315789474), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.5684210526315789, 0.37894736842105264) and draw a circle with radius 0.18947368421052632. For sketch 0, extrude the shapes (loop0, loop1) by 0.1875 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.5234375, -0.375, 0.1875), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 2 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.09473684210526316, 0.0), draw a line to point (0.09473684210526316, 0.75), draw a line to point (0.0, 0.75), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop2) by -0.0390625 units along the normal direction and cut the result from the existing solid. For sketch 2, create a workplane with an origin at coordinates (-0.09375, 0.1640625, 0.1875), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 3 in sketch 2, create a closed shape by performing the following operations in sequence: move to (0.0, 0.0) and draw a three-point arc through midpoint (0.09325657894736841, 0.025192570203331616) to endpoint (0.18651315789473683, 0.0), draw a line to point (0.18651315789473683, 0.2109375), draw a line to point (0.0, 0.2109375), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 2, extrude the shapes (loop3) by -0.0390625 units along the normal direction and cut the result from the existing solid. For sketch 3, create a workplane with an origin at coordinates (-0.09375, -0.375, 0.1875), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 4 in sketch 3, create a closed shape by performing the following operations in sequence: move to point (0.18651315789473683, 0.0), draw a line to point (0.18651315789473683, 0.2109375), draw a three-point arc through midpoint (0.09325657894736841, 0.18574492979666832) to endpoint (0.0, 0.2109375), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 3, extrude the shapes (loop4) by -0.0390625 units along the normal direction and cut the result from the existing solid."
+Output:
+{
+  "part_name": "A freestyle part",
+  "description": "A base rectangular plate with a central circular cutout, followed by three separate cutting operations (a slot, and two specialized curved cuts) extruded negatively from custom workplanes.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0 (Base Plate)",
+      "workplane": {
+        "origin": [-0.5625, -0.375, 0.0],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Outer Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [1.125, 0.0]},
+            {"type": "line_to", "point": [1.125, 0.7461]},
+            {"type": "line_to", "point": [0.0, 0.7461]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Central Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.5684, 0.379],
+            "radius": 0.1895
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.1875
+      }
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid1 (Left Slot Cut)",
+      "workplane": {
+        "origin": [-0.5234, -0.375, 0.1875],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop2 (Rectangle Cut)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.0947, 0.0]},
+            {"type": "line_to", "point": [0.0947, 0.75]},
+            {"type": "line_to", "point": [0.0, 0.75]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": -0.0391
+      },
+      "combine_operation": "cut"
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid2 (Top Arc Cut)",
+      "workplane": {
+        "origin": [-0.09375, 0.1641, 0.1875],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop3 (Arc Cutout)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.0, 0.0]},
+            {"type": "three_point_arc", "end_point": [0.1865, 0.0], "control_point": [0.0933, 0.0252]},
+            {"type": "line_to", "point": [0.1865, 0.2109]},
+            {"type": "line_to", "point": [0.0, 0.2109]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": -0.0391
+      },
+      "combine_operation": "cut"
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid3 (Bottom Arc Cut)",
+      "workplane": {
+        "origin": [-0.09375, -0.375, 0.1875],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop4 (Inverted Arc Cutout)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.1865, 0.0]},
+            {"type": "line_to", "point": [0.1865, 0.2109]},
+            {"type": "three_point_arc", "end_point": [0.0, 0.2109], "control_point": [0.0933, 0.1857]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": -0.0391
+      },
+      "combine_operation": "cut"
+    }
+  ]
+}
+#12:
+Input: "Generate a cadquery python script with accurate workplanes, sketches and operations based on the following instructions. For sketch 0, create a workplane with an origin at coordinates (-0.5859375, 0.0, 0.0390625), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 0 in sketch 0, create a closed shape by performing the following operations in sequence: move to point (0.29210526315789476, 0.0), draw a line to point (0.578125, 0.0), draw a line to point (0.4807565789473684, 0.2799342105263158), draw a three-point arc through midpoint (0.2890625, 0.42765015331427847) to endpoint (0.09736842105263158, 0.2799342105263158), and draw a line to point (0.0, 0.0), and then close the loop. For loop 1 in sketch 0, create a closed shape by performing the following operation: move to (0.29210526315789476, 0.22516447368421053) and draw a circle with radius 0.11562499999999999. For sketch 0, extrude the shapes (loop0, loop1) by 0.453125 units along the normal direction to create a new solid. For sketch 1, create a workplane with an origin at coordinates (-0.75, 0.0, -0.03125), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 2 in sketch 1, create a closed shape by performing the following operations in sequence: move to point (0.45394736842105265, 0.0), draw a line to point (0.8984375, 0.0), draw a line to point (0.8984375, 0.06620065789473684), draw a line to point (0.7376644736842105, 0.06620065789473684), draw a line to point (0.45394736842105265, 0.06620065789473684), draw a line to point (0.16077302631578946, 0.06620065789473684), draw a line to point (0.0, 0.06620065789473684), and draw a line to point (0.0, 0.0), and then close the loop. For sketch 1, extrude the shapes (loop2) by 0.453125 units along the normal direction and union the result with the existing solid. For sketch 2, create a workplane with an origin at coordinates (-0.4140625, 0.0, 0.2578125), an x-axis direction vector of (1.0, 6.123233995736766e-17, -6.123233995736766e-17), and a normal vector of (6.123233995736766e-17, -1.0, 6.123233995736766e-17). For loop 3 in sketch 2, create a closed shape by performing the following operation: move to (0.11052631578947367, 0.0) and draw a circle with radius 0.1082236842105263. For loop 4 in sketch 2, create a closed shape by performing the following operation: move to (0.11052631578947367, 0.0) and draw a circle with radius 0.08059210526315788. For sketch 2, extrude the shapes (loop3, loop4) by 0.515625 units along the normal direction and union the result with the existing solid. For sketch 3, create a workplane with an origin at coordinates (-0.7109375, -0.2265625, 0.0390625), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 5 in sketch 3, create a closed shape by performing the following operation: move to (0.039473684210526314, 0.0) and draw a circle with radius 0.039473684210526314. For sketch 3, extrude the shapes (loop5) symmetrically by 0.078125 units in both directions along the normal and cut the result from the existing solid. For sketch 4, create a workplane with an origin at coordinates (0.03125, -0.2265625, 0.0390625), an x-axis direction vector of (1.0, 0.0, 0.0), and a normal vector of (0.0, 0.0, 1.0). For loop 6 in sketch 4, create a closed shape by performing the following operation: move to (0.039473684210526314, 0.0) and draw a circle with radius 0.03865131578947368. For sketch 4, extrude the shapes (loop6) symmetrically by 0.078125 units in both directions along the normal and cut the result from the existing solid."
+Output:
+{
+  "part_name": "A freestyle part",
+  "description": "A complex solid constructed from four unioned extruded parts and two subsequent cut operations. The base features include a rounded, recessed top shape and an internal concentric ring.",
+  "cad_operations": [
+    {
+      "type": "base_solid_extrude",
+      "name": "solid0 (Top Base)",
+      "workplane": {
+        "origin": [-0.5859, 0.0, 0.0391],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop0 (Outer Profile)",
+          "type": "polyline_with_arcs",
+          "operations": [
+            {"type": "move_to", "point": [0.2921, 0.0]},
+            {"type": "line_to", "point": [0.5781, 0.0]},
+            {"type": "line_to", "point": [0.4808, 0.2799]},
+            {"type": "three_point_arc", "end_point": [0.0974, 0.2799], "control_point": [0.2891, 0.4277]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        },
+        {
+          "name": "loop1 (Central Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.2921, 0.2252],
+            "radius": 0.1156
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.4531
+      }
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid1 (Bottom Base)",
+      "workplane": {
+        "origin": [-0.75, 0.0, -0.03125],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop2 (Notched Rectangle)",
+          "type": "polyline",
+          "operations": [
+            {"type": "move_to", "point": [0.4539, 0.0]},
+            {"type": "line_to", "point": [0.8984, 0.0]},
+            {"type": "line_to", "point": [0.8984, 0.0662]},
+            {"type": "line_to", "point": [0.7377, 0.0662]},
+            {"type": "line_to", "point": [0.4539, 0.0662]},
+            {"type": "line_to", "point": [0.1608, 0.0662]},
+            {"type": "line_to", "point": [0.0, 0.0662]},
+            {"type": "line_to", "point": [0.0, 0.0]},
+            {"type": "close_path"}
+          ]
+        }
+      ],
+      "extrude": {
+        "distance": 0.4531
+      },
+      "combine_operation": "union"
+    },
+    {
+      "type": "union_extrude",
+      "name": "solid2 (Central Tube)",
+      "workplane": {
+        "origin": [-0.4141, 0.0, 0.2578],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, -1.0, 0.0]
+      },
+      "sketch": [
+        {
+          "name": "loop3 (Outer Circle)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.1105, 0.0],
+            "radius": 0.1082
+          }
+        },
+        {
+          "name": "loop4 (Inner Circle/Hole)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.1105, 0.0],
+            "radius": 0.0806
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.5156
+      },
+      "combine_operation": "union"
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid3 (Left Symmetrical Cut)",
+      "workplane": {
+        "origin": [-0.7109, -0.2266, 0.0391],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop5 (Small Circle)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.0395, 0.0],
+            "radius": 0.0395
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.0781,
+        "symmetrical": true
+      },
+      "combine_operation": "cut"
+    },
+    {
+      "type": "cut_extrude",
+      "name": "solid4 (Right Symmetrical Cut)",
+      "workplane": {
+        "origin": [0.03125, -0.2266, 0.0391],
+        "x_direction": [1.0, 0.0, 0.0],
+        "normal": [0.0, 0.0, 1.0]
+      },
+      "sketch": [
+        {
+          "name": "loop6 (Small Circle)",
+          "type": "circle",
+          "parameters": {
+            "center": [0.0387, 0.0],
+            "radius": 0.0387
+          }
+        }
+      ],
+      "extrude": {
+        "distance": 0.0781,
+        "symmetrical": true
+      },
+      "combine_operation": "cut"
     }
   ]
 }
