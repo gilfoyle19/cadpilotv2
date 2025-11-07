@@ -31,9 +31,9 @@ class ModelVisualizer:
 
             #create interactive plotter
             self.plotter = pv.Plotter()
-            self.plotter.add_mesh(mesh, color="lightblue", show_edges=True, opacity=0.9)
+            self.plotter.add_mesh(mesh, color="lightblue", show_edges=False, opacity=1.0)
             self.plotter.show_axes()
-            self.plotter.add_title("CADpilotV2 - 3D Model Preview", font_size=14)
+            self.plotter.add_title("CADpilotV2 - 3D Model Preview", font_size=10)
 
             #Save screenshot if requested
             screenshot_saved = None

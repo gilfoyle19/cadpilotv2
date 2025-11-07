@@ -25,7 +25,7 @@ class CodeWorker(BaseWorker):
             {"role": "user", "content": user_prompt}            #SPECIFIC REQUEST
         ]
         
-        generated_code = await self._call_llm(messages, temperature=0.3, max_tokens=1500)
+        generated_code = await self._call_llm(messages, temperature=0.3, max_tokens=5000)
         self._validate_code_structure(generated_code)
         
         logger.success(f"Generated code ({len(generated_code)} characters)")
